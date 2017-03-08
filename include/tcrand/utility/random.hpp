@@ -8,16 +8,16 @@ using std::random_shuffle;
 using std::uniform_real_distribution;
 using std::uniform_int_distribution;
 
-namespace tcframe {
-	 mt19937 __engine;
+namespace tcrand {
+	 mt19937 __engine__;
 
     void setSeed(unsigned int seed) {
-        __engine.seed(seed);
+        __engine__.seed(seed);
     }
 
     int randInt(int minNum, int maxNum) {
         uniform_int_distribution<int> distr(minNum, maxNum);
-        return distr(__engine);
+        return distr(__engine__);
     }
 
     int randInt(int maxNumEx) {
@@ -26,18 +26,19 @@ namespace tcframe {
 
     long long randLongLong(long long minNum, long long maxNum) {
         uniform_int_distribution<long long> distr(minNum, maxNum);
-        return distr(__engine);
+        return distr(__engine__);
     }
 
     long long randLongLong(long long maxNumEx) {
         return randLongLong(0, maxNumEx - 1);
     }
 
-    
-    template<typename RandomAccessIterator>
-    void shuffle(RandomAccessIterator first, RandomAccessIterator last) {
-        random_shuffle(first, last, [this](unsigned int idx) { return randInt(idx); });
+    double randDouble(double minNum, double maxNum) {
+        uniform_real_distribution<double> distr(minNum, maxNum);
+        return distr(__engine__);
     }
 
-
+    double randDouble(double maxNum) {
+        return randDouble(0, maxNum);
+    }
 }

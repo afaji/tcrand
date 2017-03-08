@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdio>
 #include <string>
+#include "random.hpp"
 using namespace std;
 
 namespace tcrand {
