@@ -6,7 +6,8 @@ using namespace std;
 using namespace tcrand;
 
 
-int main() {       n   
+int main() {
+	TreeRandomizer tree_rand;
 	Tree t = tree_rand.node(6).next();
 	cout<<"I am printing the tree (result may vary)"<<endl;
 	t.print();

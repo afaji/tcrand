@@ -266,8 +266,7 @@ namespace tcrand {
 				to.push_back(i);
 				from.push_back(par[i]);	
 			}
-			t.pathTo(to);
-			t.pathFrom(from);
+			t.setPath(from, to);
 		}
 
 	public:

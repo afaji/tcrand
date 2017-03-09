@@ -6,15 +6,16 @@
 #include <string>
 #include <cstdio>
 #include <iostream>
-#include "tree.hpp"
+#include "graph.hpp"
 #define DEBUG false
 using namespace std;
 
 namespace tcrand {
 
-	class Tree{
+	class Graph{
 		vector<int> _path_from;
 		vector<int> _path_to;
+		int num_edges;
 		int num_nodes;
 		
 		template< class T >
@@ -33,7 +34,11 @@ namespace tcrand {
 		void setPath(vector<int> p_from, vector<int> p_to){
 			_path_from = p_from;
 			_path_to = p_to;
-			num_nodes = p_from.size() + 1;
+			num_edges = p_from.size();
+		}
+
+		void setNode(int n){
+			num_nodes = n;
 		}
 
 		vector<int> pathFrom(){
@@ -44,8 +49,15 @@ namespace tcrand {
 			return _path_to;
 		}
 
+		int node(){
+			return num_nodes;
+		}
 
-		Tree& shuffleOrder(){
+		int edge(){
+			return num_edges;
+		}
+
+		Graph& shuffleOrder(){
 			int N = _path_to.size();
 			vector<int> indexes;
 			for (int i=0;i<N;i++)
@@ -56,25 +68,10 @@ namespace tcrand {
 			return *this;
 		}
 
-		Tree& shuffleDirection(){
-			int N = _path_to.size();
-			for (int i=0;i<N;i++){
-				if (randInt(100) % 2)
-					swap(_path_to[i], _path_from[i]);
-			}
-			return *this;
-		}
-
-		Tree& shuffle(){
-			shuffleOrder();
-			shuffleDirection();
-			return *this;
-		}
 
 		void print(FILE * pFile = stdout){
-			int N = _path_from.size();
-			fprintf(pFile, "%d\n",N + 1);
-			for (int i=0;i<N;i++){
+			fprintf(pFile, "%d %d\n",num_nodes, num_edges);
+			for (int i=0;i<num_edges;i++){
 				fprintf(pFile, "%d %d\n", _path_from[i], _path_to[i] );
 			}
 		}
