@@ -43,11 +43,13 @@ class GraphRandomizer{
 
 	bool is_scc_set;
 	bool is_component_set;
-	bool allow_self_path;
+	bool allow_loop;
 	bool is_directed;
 	bool is_bridge_set;
 
-
+	enum GraphType { type_basic, type_dag, type_bipartite };
+	GraphType graph_type;
+	float bipartite_ratio;
 
 
 	bool addEdge(int st, int ed, set<pair<int, int > >& pathSet){
@@ -126,6 +128,13 @@ class GraphRandomizer{
 		num_scc = params_scc;
 		num_components = params_components;
 		num_edges = params_edges;
+		if (num_edges < 0)
+			num_edges = num_nodes * 11 / 10;
+
+		if (graph_type == type_dag){
+			num_scc = num_nodes;
+			is_directed = true;
+		}
 	}
 
 	Graph load_graph(const set<pair<int, int > >& pathSet){
@@ -145,14 +154,27 @@ public:
 	GraphRandomizer(){
 		params_components = 1;
 		params_nodes = 8;
-		params_edges = 8;
-		allow_self_path = false;
+		params_edges = -1;
+		allow_loop = false;
 		is_component_set = false;
 		is_scc_set = false;
 		is_directed = true;
 		is_bridge_set = false;
+		graph_type = type_basic;
+	}
+	//special graphs
+	GraphRandomizer& dag(){
+		graph_type = type_dag;
+		return *this;
 	}
 
+	GraphRandomizer& bipartite(float ratio = 0.5){
+		graph_type = type_bipartite;
+		bipartite_ratio = ratio;
+		return *this;
+	}
+
+	// parameters
 	GraphRandomizer& component(int n){
 		params_components = n;
 		is_component_set = true;
@@ -177,6 +199,11 @@ public:
 	
 	GraphRandomizer& directed(bool n){
 		is_directed = n;
+		return *this;
+	}
+
+	GraphRandomizer& loop(bool n){
+		allow_loop = n;
 		return *this;
 	}
 
@@ -241,7 +268,7 @@ public:
 				v2 = options[idx].second;
 				idx++;
 			}
-			if (!allow_self_path && v1 == v2)
+			if (!allow_loop && v1 == v2)
 				continue;
 			//don't make a new cycle
 			if (is_scc_set && v1 < v2) 
