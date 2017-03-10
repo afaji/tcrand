@@ -1,5 +1,5 @@
 #pragma once
-
+#define DEBUG false
 #include "tcrand/string/StringRandomizer.hpp"
 namespace tcrand {
 
@@ -96,7 +96,7 @@ class GrammarRandomizer{
 				depth = tmp_depth - generated;
 				next_depth = depth;
 				if (split > 1 && next_depth > 0){
-					next_depth = rand() % next_depth;
+					next_depth = randInt(next_depth);
 				}
 				if (next_depth <= 2)
 					depth = 0;
@@ -122,12 +122,12 @@ class GrammarRandomizer{
 				continue;
 			}
 
-			int chooser = rand() % modulo;
+			int chooser = randInt(modulo);
 
 			if (size_terminal == 0 ||  //if nonterminal is the only option
 				(depth > target_depth && size_nonterminal > 0) ||  //if you still need to reach minimum depth, and is possible to expand nonterminal
 				( depth >  0 && depth <= target_depth && chooser < size_nonterminal )  ){ //or randomly selected to do so
-				int idx = rand() % size_nonterminal;
+				int idx = randInt(size_nonterminal);
 				generated += traverse_cfg( nonterminal[rule[i]][idx] , next_depth );
 				split--;
 				continue;
@@ -138,7 +138,7 @@ class GrammarRandomizer{
 			if (size_nonterminal == 0 ||  //if terminal is the only option
 				(depth <= 0 && size_terminal > 0 ) ||  //if max depth is exedeed.
 				( depth > 0 && depth <= target_depth && chooser < size_nonterminal ) ){ //selected randomly
-				int idx = rand() % size_terminal;
+				int idx = randInt(size_terminal);
 				split--;
 				if (idx < terminal_str[rule[i]].size() ){
 					generated += traverse_cfg( terminal_str[rule[i]][idx] , next_depth );
@@ -195,7 +195,10 @@ public:
 		if (params_prob_length <= 0)
 			traverse_cfg(params_start, params_max_depth);
 		else
-			traverse_cfg(params_start, params_prob_length);
+			do {
+				result.clear();
+				traverse_cfg(params_start, params_prob_length);
+			} while(result.size() > params_prob_length);
 		string s(result.begin(), result.end());
 		return s;
 	}

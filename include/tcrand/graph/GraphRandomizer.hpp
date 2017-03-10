@@ -6,7 +6,7 @@
 #include <string>
 #include <cstdio>
 #include <iostream>
-#include "graph.hpp"
+#include "tcrand/graph.hpp"
 #define DEBUG false
 using namespace std;
 

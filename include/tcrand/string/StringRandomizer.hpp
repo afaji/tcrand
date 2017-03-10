@@ -9,7 +9,7 @@
 #include <iostream>
 #include <map>
 #include <regex>
-#define DEBUG false
+#include "tcrand/string.hpp"
 using namespace std;
 
 namespace tcrand {
@@ -22,24 +22,40 @@ class StringRandomizer{
 	int num_length;
 
 	vector<char> charset_;
+	vector<char> lead_charset_;
+	vector<char> trail_charset_;
+
 	enum StringType { type_none, type_palindrome };
 	StringType string_type;
 
 	void load_params(){
-		int len = params_minlength + rand() % (params_maxlength - params_minlength + 1);
+		if (charset_.size() == 0)
+			charset("[a-z]");
+		if (lead_charset_.size() == 0)
+			lead_charset_ = charset_;
+		if (trail_charset_.size() == 0)
+			trail_charset_ = charset_;
+
+		int len = randInt(params_minlength, params_maxlength);
 		num_length = len;
 	}
 
 
 	string generate(int n){
-		if (charset_.size() == 0)
-			charset("a-z");
-
 		string tmp = "";
-		for (int i=0;i<n;i++){
-			int idx = rand() % charset_.size();
+		if (n == 1){
+			tmp += lead_charset_[ randInt(lead_charset_.size()) ];
+			return tmp;
+		}
+		
+		tmp += lead_charset_[ randInt(lead_charset_.size()) ];
+
+		for (int i=1;i<n-1;i++){
+			int idx = randInt(charset_.size());
 			tmp += charset_[idx];
 		}
+
+		tmp += trail_charset_[ randInt(lead_charset_.size()) ];
 
 		return tmp;
 	}
@@ -60,10 +76,40 @@ public:
 		}
 		return *this;
 	}
+	
+	StringRandomizer& leadingCharset(regex e){
+		for (int i=0;i<256;i++){
+			string test = "";
+			test += (char)i;
+			if(regex_match(test, e))
+				lead_charset_.push_back(i);
+		}
+		return *this;
+	}
+	
+	StringRandomizer& trailingCharset(regex e){
+		for (int i=0;i<256;i++){
+			string test = "";
+			test += (char)i;
+			if(regex_match(test, e))
+				trail_charset_.push_back(i);
+		}
+		return *this;
+	}
 
 	StringRandomizer& charset(string s){
-		regex tmp("[" + s + "]");
+		regex tmp(s);
 		return charset(tmp);
+	}
+
+	StringRandomizer& leadingCharset(string s){
+		regex tmp(s);
+		return leadingCharset(tmp);
+	}
+
+	StringRandomizer& trailingCharset(string s){
+		regex tmp(s);
+		return trailingCharset(tmp);
 	}
 
 	StringRandomizer& length(int lo, int hi){
