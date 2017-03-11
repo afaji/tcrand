@@ -43,8 +43,6 @@ namespace tcrand {
 		vector<int> nodeWeight;
 		vector<int> pathWeight;
 
-		const int MAGIC = 30;
-
 		void validate(){
 			switch(tree_type){
 				case type_star: 
