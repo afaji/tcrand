@@ -44,6 +44,9 @@ namespace tcrand {
 			return _path_to;
 		}
 
+		int node(){
+			return num_nodes;
+		}
 
 		Tree& shuffleOrder(){
 			int N = _path_to.size();
