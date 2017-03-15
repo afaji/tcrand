@@ -28,4 +28,21 @@ int main() {
 	vector<string> res = list_rnd.next();
 	for (string v:res)
 		cout<<v<<endl;
+
+	vector<int> x = {1, 2, 3, 4, 5, 6, 7, 8};
+	vector<int> y = randomSubsequence(x);
+	vector<int> z = randomSubvector(x);
+
+
+	for (int v:z)
+		cout<<v<<endl;
+	cout<<endl;
+	for (int v:y)
+		cout<<v<<endl;
+	cout<<endl;
+
+	string s = "lorem ipsum sir dolor amet";
+	cout<<randomSubsequence(s,5)<<endl;
+	cout<<randomSubstring(s,5)<<endl;
+
 }
