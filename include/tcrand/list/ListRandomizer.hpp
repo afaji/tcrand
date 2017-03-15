@@ -19,7 +19,7 @@ namespace tcrand {
 		vector<T> result;
 		function<T(void)> generator;
 		map<T, int> occurences;
-		int length;
+		int param_length;
 
 		int distinct_elements;
 		bool is_unique;
@@ -28,7 +28,7 @@ namespace tcrand {
 		void load_params(){
 			occurences.clear();
 			if (distinct_elements == -1 && is_unique){
-				distinct_elements = length;
+				distinct_elements = param_length;
 			}
 		}
 
@@ -36,10 +36,14 @@ namespace tcrand {
 	public:
 
 		ListRandomizer(){
-			length = 10;
-			generator = []{return randDouble(0, 20); };
+			param_length = 10;
 			is_unique = false;
 			distinct_elements = -1;
+		}
+
+		ListRandomizer& length(int n){
+			param_length = n;
+			return *this;
 		}
 
 		ListRandomizer& engine(function<T(void)> f){
@@ -62,7 +66,9 @@ namespace tcrand {
 
 		vector<T> next(){
 			load_params();
-
+			if (!generator){
+				throw runtime_error("please define your engine");
+			}
 			result.clear();
 
 			//create all valid sets
@@ -78,7 +84,7 @@ namespace tcrand {
 				}
 			}
 			
-			while (result.size() < length ){
+			while (result.size() < param_length ){
 				T res;
 				if (distinct_elements > 0){
 					res = result[ randInt(options) ];
