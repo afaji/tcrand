@@ -40,7 +40,7 @@ class GraphRandomizer{
 	int params_nodes;
 	int params_scc;
 	int params_bridge;
-
+	int params_index_base;
 	bool is_scc_set;
 	bool is_component_set;
 	bool allow_loop;
@@ -142,8 +142,8 @@ class GraphRandomizer{
 		vector<int> from;
 		vector<int> to;
 		for (auto path: pathSet){
-			from.push_back(path.first);
-			to.push_back(path.second);
+			from.push_back(path.first + params_index_base);
+			to.push_back(path.second + params_index_base);
 		}
 		Graph g = Graph(num_nodes, from, to);
 		return g;
@@ -151,6 +151,7 @@ class GraphRandomizer{
 
 public:
 	GraphRandomizer(){
+		params_index_base = 0;
 		params_components = 1;
 		params_nodes = 8;
 		params_edges = -1;
@@ -171,6 +172,11 @@ public:
 	GraphRandomizer& bipartite(float ratio = 0.5){
 		graph_type = type_bipartite;
 		bipartite_ratio = ratio;
+		return *this;
+	}
+
+	GraphRandomizer& index_base(int b){
+		params_index_base = b;
 		return *this;
 	}
 
