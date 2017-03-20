@@ -2,10 +2,10 @@
 
 #include <algorithm>
 #include <random>
-#include <random.hpp>
+#include "../utility.hpp"
 
 
 
 namespace tcrand {
-	
+
 }

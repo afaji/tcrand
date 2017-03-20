@@ -41,4 +41,37 @@ namespace tcrand {
     double rand_double(double maxNum) {
         return rand_double(0, maxNum);
     }
+
+
+
+
+    //Deprecated
+
+    int randInt(int minNum, int maxNum) {
+        uniform_int_distribution<int> distr(minNum, maxNum);
+        return distr(__engine__);
+    }
+
+    int randInt(int maxNumEx) {
+        return rand_int(0, maxNumEx - 1);
+    }
+
+    long long randLongLong(long long minNum, long long maxNum) {
+        uniform_int_distribution<long long> distr(minNum, maxNum);
+        return distr(__engine__);
+    }
+
+    long long randLongLong(long long maxNumEx) {
+        return rand_long(0, maxNumEx - 1);
+    }
+
+    double randDouble(double minNum, double maxNum) {
+        uniform_real_distribution<double> distr(minNum, maxNum);
+        return distr(__engine__);
+    }
+
+    double randDouble(double maxNum) {
+        return rand_double(0, maxNum);
+    }
+
 }

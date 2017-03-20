@@ -28,7 +28,7 @@ void sample_test(){
 	cerr<<"  random palindrome capital string of length 7 : "<<str_rand2.length(7).charset("[A-Z]").palindrome().next()<<endl;
 	StringRandomizer str_rand3;
 	cerr<<"  random binary string of length 10 : "<<str_rand3.length(10).charset("[01]").next()<<endl;
-	cerr<<"  random substring of \"Hello world!\" : "<<random_substring("Hello world!")<<endl;
+	cerr<<"  random substring of \"Hello world!\" : "<<randomSubstring("Hello world!")<<endl;
 
 
 	cerr<<"\nSpeed Test: DONE\n"<<endl;
