@@ -14,7 +14,7 @@ namespace tcrand {
 
 	vector<int> random_with_sum(int count, int sum){
 		vector<int> res;
-		for (int i=0;i < count-1;i++) res.push_back(randInt(sum - count + 1));
+		for (int i=0;i < count-1;i++) res.push_back(rand_int(sum - count + 1));
 		res.push_back(sum - count);
 		sort(res.begin(), res.end());
 		for (int i=count-1;i>=1;i--) res[i] = 1 + (res[i] - res[i-1]);
@@ -80,12 +80,12 @@ class GraphRandomizer{
 
 		while (pos + 1 < N){
 			int begin_pos = ++pos;
-			int start_circle = V[ randInt(pos) ];
-			int end_circle = V[ randInt(pos) ];
+			int start_circle = V[ rand_int(pos) ];
+			int end_circle = V[ rand_int(pos) ];
 			//compute the probability of taking the next node to the circle.
 			//also when you're running out of edges, there's no other option but join them all in single circle
 			//cout<<"Mulai di "<<start_circle<<" stop di "<<end_circle<< endl;
-			while (pos + 1 < N && (randInt(N) > pos || E - used <= N - begin_pos + 1)) pos++;
+			while (pos + 1 < N && (rand_int(N) > pos || E - used <= N - begin_pos + 1)) pos++;
 			//join everyone
 			for (int i=begin_pos + 1; i<=pos;i++, used++) addEdge(V[i-1], V[i], pathSet);
 			addEdge(start_circle, V[begin_pos], pathSet);
@@ -107,9 +107,9 @@ class GraphRandomizer{
 				for (int j=1;j< component_size[i] ;j++){
 					int scc_from = j + pos;
 					//magic (so that low numbered nodes do not have too big degree)
-					int scc_to = randInt(pos + j / 3, j - 1);
-					int v1 = scc_members[ scc_from ][ randInt( scc_members[scc_from].size() ) ];
-					int v2 = scc_members[ scc_to ][ randInt(scc_members[scc_to].size() ) ];
+					int scc_to = rand_int(pos + j / 3, j - 1);
+					int v1 = scc_members[ scc_from ][ rand_int( scc_members[scc_from].size() ) ];
+					int v2 = scc_members[ scc_to ][ rand_int(scc_members[scc_to].size() ) ];
 					addEdge(v1, v2, pathSet);
 				
 				}
@@ -257,9 +257,9 @@ public:
 		int tries = 0;
 		int max_attempt = 10 * num_edges;
 		while(used < num_edges && tries++ < max_attempt){
-			int v1 = randInt(num_nodes);
+			int v1 = rand_int(num_nodes);
 			int cid = component_id[v1];
-			int v2 = component_members[cid][randInt(component_members[cid].size())];
+			int v2 = component_members[cid][rand_int(component_members[cid].size())];
 			if (num_nodes <= 1000){
 				if (idx >= options.size()){
 					throw runtime_error("insufficient edges");

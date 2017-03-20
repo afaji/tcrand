@@ -9,7 +9,7 @@
 #include <iostream>
 #include <map>
 #include <regex>
-#include "tcrand/string.hpp"
+#include "../string.hpp"
 using namespace std;
 
 namespace tcrand {
@@ -36,7 +36,7 @@ class StringRandomizer{
 		if (trail_charset_.size() == 0)
 			trail_charset_ = charset_;
 
-		int len = randInt(params_minlength, params_maxlength);
+		int len = rand_int(params_minlength, params_maxlength);
 		num_length = len;
 	}
 
@@ -44,18 +44,18 @@ class StringRandomizer{
 	string generate(int n){
 		string tmp = "";
 		if (n == 1){
-			tmp += lead_charset_[ randInt(lead_charset_.size()) ];
+			tmp += lead_charset_[ rand_int(lead_charset_.size()) ];
 			return tmp;
 		}
 		
-		tmp += lead_charset_[ randInt(lead_charset_.size()) ];
+		tmp += lead_charset_[ rand_int(lead_charset_.size()) ];
 
 		for (int i=1;i<n-1;i++){
-			int idx = randInt(charset_.size());
+			int idx = rand_int(charset_.size());
 			tmp += charset_[idx];
 		}
 
-		tmp += trail_charset_[ randInt(lead_charset_.size()) ];
+		tmp += trail_charset_[ rand_int(lead_charset_.size()) ];
 
 		return tmp;
 	}
@@ -77,7 +77,7 @@ public:
 		return *this;
 	}
 	
-	StringRandomizer& leadingCharset(regex e){
+	StringRandomizer& first_charset(regex e){
 		for (int i=0;i<256;i++){
 			string test = "";
 			test += (char)i;
@@ -87,7 +87,7 @@ public:
 		return *this;
 	}
 	
-	StringRandomizer& trailingCharset(regex e){
+	StringRandomizer& last_charset(regex e){
 		for (int i=0;i<256;i++){
 			string test = "";
 			test += (char)i;
@@ -102,14 +102,14 @@ public:
 		return charset(tmp);
 	}
 
-	StringRandomizer& leadingCharset(string s){
+	StringRandomizer& first_charset(string s){
 		regex tmp(s);
-		return leadingCharset(tmp);
+		return first_charset(tmp);
 	}
 
-	StringRandomizer& trailingCharset(string s){
+	StringRandomizer& last_charset(string s){
 		regex tmp(s);
-		return trailingCharset(tmp);
+		return last_charset(tmp);
 	}
 
 	StringRandomizer& length(int lo, int hi){

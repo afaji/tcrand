@@ -87,7 +87,7 @@ namespace tcrand {
 			while (result.size() < param_length ){
 				T res;
 				if (distinct_elements > 0){
-					res = result[ randInt(options) ];
+					res = result[ rand_int(options) ];
 				} else {
 					res = (T) generator();
 				}

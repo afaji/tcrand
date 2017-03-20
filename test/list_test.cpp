@@ -30,8 +30,8 @@ int main() {
 		cout<<v<<endl;
 
 	vector<int> x = {1, 2, 3, 4, 5, 6, 7, 8};
-	vector<int> y = randomSubsequence(x);
-	vector<int> z = randomSubvector(x);
+	vector<int> y = rand_subsequence(x);
+	vector<int> z = rand_subarray(x);
 
 
 	for (int v:z)
@@ -42,7 +42,7 @@ int main() {
 	cout<<endl;
 
 	string s = "lorem ipsum sir dolor amet";
-	cout<<randomSubsequence(s,5)<<endl;
-	cout<<randomSubstring(s,5)<<endl;
+	cout<<rand_subsequence(s,5)<<endl;
+	cout<<rand_subarray(s,5)<<endl;
 
 }

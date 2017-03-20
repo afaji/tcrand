@@ -5,35 +5,21 @@
 using namespace std;
 
 namespace tcrand {
-	string randomSubstring(string& data, int length){
-		int start_pos = rand_int(data.size() - length);
-		return data.substr(start_pos, length);
-	}
-
-	string randomSubstring(string& data){
-		return randomSubstring(data, rand_int(1, data.size() - 1) );
-	}
-
-	string randomSubstring(char* data){
-		string data_str(data);
-		return randomSubstring(data_str);
-	}
-
 	template <typename Vector>
-	Vector randomSubvector(Vector v, int length){
+	Vector rand_subarray(Vector v, int length){
 		int start_pos = rand_int(v.size() - length);
 	
 		return Vector(v.begin() + start_pos , v.begin() + start_pos + length);
 	}
 	
 	template <typename Vector>
-	Vector randomSubvector(Vector v){
-		return randomSubvector(v, rand_int(1, v.size() - 1) );
+	Vector rand_subarray(Vector v){
+		return rand_subarray(v, rand_int(1, v.size() - 1) );
 	}
 
 
 	template <typename Vector>
-	Vector randomSubsequence(Vector v, int length){
+	Vector rand_subsequence(Vector v, int length){
 		Vector res;
 		int N = v.size();
 		for (int i=0;i<N;i++){
@@ -48,7 +34,7 @@ namespace tcrand {
 	}
 
 	template <typename Vector>
-	Vector randomSubsequence(Vector v){
-		return randomSubsequence(v, rand_int(1, v.size() - 1) );
+	Vector rand_subsequence(Vector v){
+		return rand_subsequence(v, rand_int(1, v.size() - 1) );
 	}
 }

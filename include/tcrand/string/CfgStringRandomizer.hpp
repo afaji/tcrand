@@ -3,7 +3,7 @@
 #include "tcrand/string/StringRandomizer.hpp"
 namespace tcrand {
 
-class GrammarRandomizer{
+class CfgStringRandomizer{
 	map<char, vector<string> > all_cfg;
 
 	map<char, vector<string> > nonterminal;
@@ -96,7 +96,7 @@ class GrammarRandomizer{
 				depth = tmp_depth - generated;
 				next_depth = depth;
 				if (split > 1 && next_depth > 0){
-					next_depth = randInt(next_depth);
+					next_depth = rand_int(next_depth);
 				}
 				if (next_depth <= 2)
 					depth = 0;
@@ -122,12 +122,12 @@ class GrammarRandomizer{
 				continue;
 			}
 
-			int chooser = randInt(modulo);
+			int chooser = rand_int(modulo);
 
 			if (size_terminal == 0 ||  //if nonterminal is the only option
 				(depth > target_depth && size_nonterminal > 0) ||  //if you still need to reach minimum depth, and is possible to expand nonterminal
 				( depth >  0 && depth <= target_depth && chooser < size_nonterminal )  ){ //or randomly selected to do so
-				int idx = randInt(size_nonterminal);
+				int idx = rand_int(size_nonterminal);
 				generated += traverse_cfg( nonterminal[rule[i]][idx] , next_depth );
 				split--;
 				continue;
@@ -138,7 +138,7 @@ class GrammarRandomizer{
 			if (size_nonterminal == 0 ||  //if terminal is the only option
 				(depth <= 0 && size_terminal > 0 ) ||  //if max depth is exedeed.
 				( depth > 0 && depth <= target_depth && chooser < size_nonterminal ) ){ //selected randomly
-				int idx = randInt(size_terminal);
+				int idx = rand_int(size_terminal);
 				split--;
 				if (idx < terminal_str[rule[i]].size() ){
 					generated += traverse_cfg( terminal_str[rule[i]][idx] , next_depth );
@@ -159,30 +159,30 @@ class GrammarRandomizer{
 
 public:
 
-	GrammarRandomizer(){
+	CfgStringRandomizer(){
 		params_min_depth = 1;
 		params_max_depth = 5;	
 		params_prob_length = -1;
 	}
 
-	GrammarRandomizer& length_around(int n){
+	CfgStringRandomizer& max_length(int n){
 		params_prob_length = n;
 		return *this;
 	}
 
 
-	GrammarRandomizer& grammar(char s, string to){
+	CfgStringRandomizer& rule(char s, string to){
 		all_cfg[s].push_back(to);
 		return *this;
 	}
 
-	GrammarRandomizer& grammar(char s, StringRandomizer& to){
+	CfgStringRandomizer& rule(char s, StringRandomizer& to){
 		terminal_Randomizer[s].push_back(&to);
 		return *this;
 	}
 
 
-	GrammarRandomizer& start(string start){
+	CfgStringRandomizer& start_with(string start){
 		params_start = start;
 		return *this;
 	}
