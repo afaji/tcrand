@@ -15,51 +15,51 @@ using namespace std;
 namespace tcrand {
 
 	template <class T>
-	class ListRandomizer{
+	class vectorRandomizer{
 		vector<T> result;
 		function<T(void)> generator;
 		map<T, int> occurences;
 		int param_length;
 
-		int distinct_elements;
+		int _distinct_elements;
 		bool is_unique;
 
 
 		void load_params(){
 			occurences.clear();
-			if (distinct_elements == -1 && is_unique){
-				distinct_elements = param_length;
+			if (_distinct_elements == -1 && is_unique){
+				_distinct_elements = param_length;
 			}
 		}
 
 
 	public:
 
-		ListRandomizer(){
+		vectorRandomizer(){
 			param_length = 10;
 			is_unique = false;
-			distinct_elements = -1;
+			_distinct_elements = -1;
 		}
 
-		ListRandomizer& length(int n){
+		vectorRandomizer& length(int n){
 			param_length = n;
 			return *this;
 		}
 
-		ListRandomizer& engine(function<T(void)> f){
+		vectorRandomizer& engine(function<T(void)> f){
 			generator = f;
 			return *this;
 		}
 
-		ListRandomizer& unique(bool u){
+		vectorRandomizer& unique(bool u){
 			is_unique = u;
-			distinct_elements = -1;
+			_distinct_elements = -1;
 			return *this;
 		}
 
-		ListRandomizer& distinctElements(int n){
+		vectorRandomizer& distinct_elements(int n){
 			is_unique = true;
-			distinct_elements = n;
+			_distinct_elements = n;
 			return *this;
 		}
 
@@ -73,8 +73,8 @@ namespace tcrand {
 
 			//create all valid sets
 			int options = 0;
-			if (is_unique && distinct_elements > 0){
-				while (result.size() < distinct_elements){
+			if (is_unique && _distinct_elements > 0){
+				while (result.size() < _distinct_elements){
 					T res = (T) generator();
 					if (occurences[res])
 						continue;
@@ -86,7 +86,7 @@ namespace tcrand {
 			
 			while (result.size() < param_length ){
 				T res;
-				if (distinct_elements > 0){
+				if (_distinct_elements > 0){
 					res = result[ rand_int(options) ];
 				} else {
 					res = (T) generator();

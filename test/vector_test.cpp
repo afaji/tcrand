@@ -1,4 +1,4 @@
-#include "tcrand/list.hpp"
+#include "tcrand/vector.hpp"
 #include "tcrand/string.hpp"
 #include <iostream>
 #include <ctime>
@@ -13,19 +13,19 @@ int main() {
 	//furthermore, we want the list to have 5 distinct elements
 	//define the object
 	StringRandomizer str_rnd;
-	ListRandomizer<string> list_rnd;
+	vectorRandomizer<string> vector_rnd;
 
 	//define the string
 	str_rnd.charset("[a-z]").length(3, 5);
 	
 	//define the list
-	list_rnd.length(20).distinctElements(5);
+	vector_rnd.length(20).distinct_elements(5);
 	
 	//embed the string randomizer into the listrandomizer
-	list_rnd.engine( [&] {return str_rnd.next();} );
+	vector_rnd.engine( [&] {return str_rnd.next();} );
 
 	//obtain and print the result
-	vector<string> res = list_rnd.next();
+	vector<string> res = vector_rnd.next();
 	for (string v:res)
 		cout<<v<<endl;
 
