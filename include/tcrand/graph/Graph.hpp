@@ -6,7 +6,7 @@
 #include <string>
 #include <cstdio>
 #include <iostream>
-#include "graph.hpp"
+#include "../graph.hpp"
 #define DEBUG false
 using namespace std;
 
@@ -26,37 +26,6 @@ namespace tcrand {
 		    }
 		}
 
-	public:
-		tuple<vector<int>,vector<int> > path(){
-			return make_tuple(_path_from, _path_to);
-		}
-		
-		void setPath(vector<int> p_from, vector<int> p_to){
-			_path_from = p_from;
-			_path_to = p_to;
-			num_edges = p_from.size();
-		}
-
-		void setNode(int n){
-			num_nodes = n;
-		}
-
-		vector<int> pathFrom(){
-			return _path_from;
-		}
-
-		vector<int> pathTo(){
-			return _path_to;
-		}
-
-		int node(){
-			return num_nodes;
-		}
-
-		int edge(){
-			return num_edges;
-		}
-
 		Graph& shuffleOrder(){
 			int N = _path_to.size();
 			vector<int> indexes;
@@ -68,14 +37,25 @@ namespace tcrand {
 			return *this;
 		}
 
-
-		void print(FILE * pFile = stdout){
-			fprintf(pFile, "%d %d\n",num_nodes, num_edges);
-			for (int i=0;i<num_edges;i++){
-				fprintf(pFile, "%d %d\n", _path_from[i], _path_to[i] );
-			}
+	public:
+		Graph(int nodes, vector<int> p_from, vector<int> p_to){
+			_path_from = p_from;
+			_path_to = p_to;
+			num_edges = p_from.size();
+			num_nodes = nodes;
+			shuffleOrder();
+		}
+		pair<vector<int>,vector<int> > edges(){
+			return make_pair(_path_from, _path_to);
+		}
+		
+		int node_count(){
+			return num_nodes;
 		}
 
+		int edge_count(){
+			return num_edges;
+		}
 	};
 
 }

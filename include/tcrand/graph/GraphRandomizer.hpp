@@ -6,7 +6,7 @@
 #include <string>
 #include <cstdio>
 #include <iostream>
-#include "tcrand/graph.hpp"
+#include "../graph.hpp"
 #define DEBUG false
 using namespace std;
 
@@ -138,15 +138,14 @@ class GraphRandomizer{
 	}
 
 	Graph load_graph(const set<pair<int, int > >& pathSet){
-		Graph g;
+		
 		vector<int> from;
 		vector<int> to;
 		for (auto path: pathSet){
 			from.push_back(path.first);
 			to.push_back(path.second);
 		}
-		g.setPath(from, to);
-		g.setNode(num_nodes);
+		Graph g = Graph(num_nodes, from, to);
 		return g;
 	}
 
@@ -158,12 +157,13 @@ public:
 		allow_loop = false;
 		is_component_set = false;
 		is_scc_set = false;
-		is_directed = true;
+		is_directed = false;
 		is_bridge_set = false;
 		graph_type = type_basic;
 	}
 	//special graphs
 	GraphRandomizer& dag(){
+		directed();
 		graph_type = type_dag;
 		return *this;
 	}
@@ -175,35 +175,35 @@ public:
 	}
 
 	// parameters
-	GraphRandomizer& component(int n){
+	GraphRandomizer& component_count(int n){
 		params_components = n;
 		is_component_set = true;
 		return *this;
 	}
 	
-	GraphRandomizer& scc(int n){
+	GraphRandomizer& scc_count(int n){
 		params_scc = n;
 		is_scc_set = true;
 		return *this;
 	}
 	
-	GraphRandomizer& node(int n){
+	GraphRandomizer& node_count(int n){
 		params_nodes = n;
 		return *this;
 	}
 	
-	GraphRandomizer& edge(int n){
+	GraphRandomizer& edge_count(int n){
 		params_edges = n;
 		return *this;
 	}
 	
-	GraphRandomizer& directed(bool n){
-		is_directed = n;
+	GraphRandomizer& directed(){
+		is_directed = true;
 		return *this;
 	}
 
-	GraphRandomizer& loop(bool n){
-		allow_loop = n;
+	GraphRandomizer& self_loop(){
+		allow_loop = true;
 		return *this;
 	}
 
