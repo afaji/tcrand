@@ -6,7 +6,7 @@
 #include <string>
 #include <cstdio>
 #include <iostream>
-#include "tree.hpp"
+#include "../tree.hpp"
 
 #define DEBUG false
 using namespace std;
@@ -21,6 +21,8 @@ namespace tcrand {
 		int params_child_min;
 		int params_child_max;
 		int params_depth;
+		int params_index_base;
+		int params_root;
 
 		// temporary parameter. only used when next() is called.
 		// these params are loaded before from params variable above
@@ -44,17 +46,11 @@ namespace tcrand {
 		vector<int> pathWeight;
 
 		void validate(){
-			switch(tree_type){
-				case type_star: 
-					
-					break;
-				case type_chain:
+			if (params_root >= 0 && params_root < params_index_base)
+				throw runtime_error("Tree root is too small");
+			if (params_root >= 0 && params_root > params_index_base + num_node)
+				throw runtime_error("Tree root is too big");
 
-					break;
-				case type_caterpillar:
-
-					break;
-			}
 		}
 
 		/* helper method. connect child_id to par_id
@@ -72,16 +68,16 @@ namespace tcrand {
 			opt_depth.push_back(0);
 			int node_id = 1;
 			int start_id = 0;
-
+			bool depth_reached = false;
 			for (int i=0;i<_comp;i++){
 				if (options.size() == start_id)
 					return false;
 
-				int idx = randInt( start_id, options.size() - 1);
+				int idx = rand_int( start_id, options.size() - 1);
 				if (greedy_mode)
 					idx = start_id;
 					
-				if (tree_type == type_caterpillar)
+				if (tree_type == type_caterpillar || is_depth_set && !depth_reached)
 					idx = options.size() - 1;
 
 				int tmp = node_id;
@@ -91,6 +87,8 @@ namespace tcrand {
 					if (!is_depth_set || num_depth > opt_depth[idx] + 1){
 						options.push_back(node_id - 1);
 						opt_depth.push_back(opt_depth[idx] + 1);
+					} else {
+						depth_reached = true;
 					}
 				}
 
@@ -116,7 +114,7 @@ namespace tcrand {
 			int in_size = inner_child.size();
 			while(need){
 				need--;
-				int idx = randInt(in_size);
+				int idx = rand_int(in_size);
 				if (greedy_mode)
 					idx = 0;
 				inner_child[idx]++;
@@ -155,7 +153,6 @@ namespace tcrand {
 			int _range =  min(num_node, child_max - child_min);
 			int _node_left = num_node - 1;
 			int _surplus = 0;
-			
 			int _comp = 0;
 			int _curr_pos = 1; //nodes currently used
 			int _curr_leaf = 1; //leaf currently available
@@ -204,7 +201,7 @@ namespace tcrand {
 			int tries = 20;
 			while (tries--){
 				//choses num of leaf randomly
-				int idx = (randInt(_leaf_opts.size()) + randInt(_leaf_opts.size()) )/ 2;
+				int idx = (rand_int(_leaf_opts.size()) + rand_int(_leaf_opts.size()) )/ 2;
 
 				num_leaf = _leaf_opts[idx].first;
 				_comp = _leaf_opts[idx].second;
@@ -254,21 +251,43 @@ namespace tcrand {
 			}
 		}
 
-		void load_tree(Tree &t, const vector<int> &par){
+		Tree load_tree(vector<int> &par){
 			vector<int> from;
 			vector<int> to;
 			int N = par.size();
+			int new_root = params_root - params_index_base;
+			if (params_root == -1)
+				new_root = 0;
+			//swap root = 0 to params_root
+			swap(par[0], par[new_root]);
 			for (int i=0;i<N;i++){
+				if (par[i] == 0)
+					par[i] = new_root;
+				else if (par[i] == new_root)
+					par[i] = 0;
 				if (par[i] == -1)
 					continue;
-				to.push_back(i);
+				par[i] += params_index_base;
+				to.push_back(i + params_index_base);
 				from.push_back(par[i]);	
 			}
-			t.setPath(from, to);
+			return Tree( new_root , from , to , par );
+		}
+
+
+		//right now, user cannot set leaf count as range
+		TreeRandomizer& leaf_count2(int lo, int hi){
+			if (lo > hi)
+				swap(lo,hi);
+			params_leaf_min = lo;
+			params_leaf_max = hi;
+			return *this;
 		}
 
 	public:
 		TreeRandomizer() {
+			params_root = -1;
+			params_index_base = 0;
 			params_child_min = 1;
 			params_child_max = 1000000;
 
@@ -284,24 +303,24 @@ namespace tcrand {
 		Tree next(){
 			parent.clear();
 			load_params();
+			validate();
 
 			for (int i=0;i<num_node;i++)
 				parent.push_back(-1);
 
 			calculate_tree();
 
-			Tree t;
-			load_tree(t, parent);
+			Tree t = load_tree(parent);
 			return t;
 		}
 
-		TreeRandomizer& node(int n){
+		TreeRandomizer& node_count(int n){
 			num_node = n;
 			return *this;
 		}
 
 
-		TreeRandomizer& child(int lo, int hi){
+		TreeRandomizer& child_count(int lo, int hi){
 			if (lo > hi)
 				swap(lo,hi);
 			params_child_min = lo;
@@ -310,27 +329,36 @@ namespace tcrand {
 			return *this;
 		}
 
-		TreeRandomizer& child(int n){
-			child(n, n);
+		TreeRandomizer& child_count(int n){
+			child_count(n, n);
 			return *this;
 		}
 
-		TreeRandomizer& leaf(int lo, int hi){
-			if (lo > hi)
-				swap(lo,hi);
-			params_leaf_min = lo;
-			params_leaf_max = hi;
-			return *this;
-		}
 
-		TreeRandomizer& leaf(int n){
-			leaf(n, n);
+
+		TreeRandomizer& leaf_count(int n){
+			leaf_count2(n, n);
 			return *this;
 		}
 
 		TreeRandomizer& depth(int d){
 			params_depth = d;
 			is_depth_set = true;
+			return *this;
+		}
+
+		TreeRandomizer& root(int r){
+
+			if (r < 0)
+				throw runtime_error("root has to be non-negative");
+			params_root = r;
+			return *this;
+		}
+
+		TreeRandomizer& index_base(int o){
+			if (o < 0)
+				throw runtime_error("index base has to be non-negative");
+			params_index_base = o;
 			return *this;
 		}
 		

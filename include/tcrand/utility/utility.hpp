@@ -6,12 +6,12 @@ using namespace std;
 
 namespace tcrand {
 	string randomSubstring(string& data, int length){
-		int start_pos = randInt(data.size() - length);
+		int start_pos = rand_int(data.size() - length);
 		return data.substr(start_pos, length);
 	}
 
 	string randomSubstring(string& data){
-		return randomSubstring(data, randInt(1, data.size() - 1) );
+		return randomSubstring(data, rand_int(1, data.size() - 1) );
 	}
 
 	string randomSubstring(char* data){
@@ -21,14 +21,14 @@ namespace tcrand {
 
 	template <typename Vector>
 	Vector randomSubvector(Vector v, int length){
-		int start_pos = randInt(v.size() - length);
+		int start_pos = rand_int(v.size() - length);
 	
 		return Vector(v.begin() + start_pos , v.begin() + start_pos + length);
 	}
 	
 	template <typename Vector>
 	Vector randomSubvector(Vector v){
-		return randomSubvector(v, randInt(1, v.size() - 1) );
+		return randomSubvector(v, rand_int(1, v.size() - 1) );
 	}
 
 
@@ -37,7 +37,7 @@ namespace tcrand {
 		Vector res;
 		int N = v.size();
 		for (int i=0;i<N;i++){
-			int c = 1 + randInt( N - i );
+			int c = 1 + rand_int( N - i );
 			
 			if (c <= length ){
 				res.push_back(v[i]);
@@ -49,6 +49,6 @@ namespace tcrand {
 
 	template <typename Vector>
 	Vector randomSubsequence(Vector v){
-		return randomSubsequence(v, randInt(1, v.size() - 1) );
+		return randomSubsequence(v, rand_int(1, v.size() - 1) );
 	}
 }

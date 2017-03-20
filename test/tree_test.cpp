@@ -8,26 +8,16 @@ using namespace tcrand;
 
 int main() {
 	TreeRandomizer tree_rand;
-	Tree t = tree_rand.node(6).next();
-	cout<<"I am printing the tree (result may vary)"<<endl;
-	t.print();
+	int N = 10;
+	Tree t = tree_rand.node_count(N).depth(5).index_base(1).root(10).next();
 
-	cout<<"Obtaining the path simultaneously via .path()"<<endl;
+
+	
 	vector<int> p1, p2;
-	tie(p1, p2) = t.path();
-	cout<<"vector p1 : "; for (int v: p1) cout<< v <<" "; cout<<endl;
-	cout<<"vector p2 : "; for (int v: p2) cout<< v <<" "; cout<<endl;
-
-	cout<<"Obtaining the path individually via .pathFrom() and .pathTo()"<<endl;
-	vector<int> p3, p4;
-	p3 = t.pathFrom();
-	p4 = t.pathTo();
-	cout<<"vector p3 : "; for (int v: p3) cout<< v <<" "; cout<<endl;
-	cout<<"vector p4 : "; for (int v: p4) cout<< v <<" "; cout<<endl;
-
-	cout<<"Shuffling the path order"<<endl;
-	t.shuffleOrder().print();
-	cout<<"Shuffling the direction"<<endl;
-	t.shuffleDirection().print();
-
+	p1 = t.edges().first;
+	p2 = t.edges().second;
+	
+	for (int i=0;i<N-1;i++){
+		cout<<p1[i] <<" "<<p2[i]<<endl;
+	}
 }
