@@ -6,6 +6,7 @@
 #include <string>
 #include <cstdio>
 #include <iostream>
+#include <map>
 #include "../graph.hpp"
 #define DEBUG false
 using namespace std;
@@ -53,14 +54,14 @@ class GraphRandomizer{
 	float bipartite_ratio;
 
 
-	bool addEdge(int st, int ed, multiset<pair<int, int > >& pathSet){
-		if (pathSet.count(make_pair(st, ed)) >= multigraph_size)
+	bool addEdge(int st, int ed, map<pair<int, int> , int>& pathSet){
+		if (pathSet[make_pair(st, ed)] >= multigraph_size)
 			return false;
 
-		if (!is_directed && pathSet.count(make_pair(ed, st)) >= multigraph_size)
+		if (!is_directed && pathSet[make_pair(st, ed)] >= multigraph_size)
 			return false;
 
-		pathSet.insert(make_pair(st, ed));
+		pathSet[make_pair(st, ed)]++;
 		return true;
 	}
 	/*
@@ -70,7 +71,7 @@ class GraphRandomizer{
 	update your edges in the set or adj. matrix
 	returns the actual number of edges used
 	*/
-	int constructDirectedComponent(const vector<int>& V, const int& E, multiset<pair<int, int > >& pathSet){
+	int constructDirectedComponent(const vector<int>& V, const int& E, map<pair<int, int> , int>& pathSet){
 		//if V is small, use temporary adj. matrix
 		int used = 0;
 		int N = V.size();
@@ -97,7 +98,7 @@ class GraphRandomizer{
 		return used;
 	}
 
-		vector<vector<int> > mergeSCCintoComponents(const vector< vector<int> >& scc_members, multiset<pair<int, int > >& pathSet, int num_components , int& used){
+		vector<vector<int> > mergeSCCintoComponents(const vector< vector<int> >& scc_members, map<pair<int, int> , int>& pathSet, int num_components , int& used){
 			vector<int> component_size = random_with_sum( num_components, scc_members.size() );
 
 			//build the membership matrix
@@ -139,13 +140,15 @@ class GraphRandomizer{
 		}
 	}
 
-	Graph load_graph(const multiset<pair<int, int > >& pathSet){
+	Graph load_graph(const map<pair<int, int> , int>& pathSet){
 		
 		vector<int> from;
 		vector<int> to;
 		for (auto path: pathSet){
-			from.push_back(path.first + params_index_base);
-			to.push_back(path.second + params_index_base);
+			for (int i=0;i<path.second;i++){
+				from.push_back(path.first.first + params_index_base);
+				to.push_back(path.first.second + params_index_base);
+			}
 		}
 		Graph g = Graph(num_nodes, from, to);
 		return g;
@@ -230,7 +233,7 @@ public:
 		if (!is_directed && !is_bridge_set)
 			num_scc = num_nodes;
 
-		multiset<pair<int,int> > paths;
+		map<pair<int,int>, int > paths;
 		
 		//split into scc. 
 		vector< vector<int> > scc_members(num_scc);
@@ -264,10 +267,11 @@ public:
 		//finishing the leftover
 		//if the nodes is small, generate all pairs instead
 		vector<pair<int, int> > options;
-		if (num_nodes <= 1000)
+		if (num_nodes * multigraph_size <= 1000)
 			for (int i=0;i<num_nodes;i++)
 				for (int j=0;j<num_nodes;j++)
-					options.push_back(make_pair(i,j));
+					for (int k=0;k<multigraph_size;k++)
+						options.push_back(make_pair(i,j));
 		random_shuffle(options.begin(), options.end());
 		int idx = 0;
 		int tries = 0;
@@ -276,9 +280,10 @@ public:
 			int v1 = rand_int(num_nodes);
 			int cid = component_id[v1];
 			int v2 = component_members[cid][rand_int(component_members[cid].size())];
-			if (num_nodes <= 1000){
+
+			if (num_nodes * multigraph_size <= 1000){
 				if (idx >= options.size()){
-					throw runtime_error("insufficient edges");
+					throw runtime_error("Insufficient edges");
 				}
 				v1 = options[idx].first;
 				v2 = options[idx].second;
@@ -290,7 +295,7 @@ public:
 			if (is_scc_set && v1 < v2) 
 				swap(v1, v2);
 			//don't use same edge
-			if (paths.count(make_pair(v1, v2)) >= multigraph_size) 
+			if (paths[make_pair(v1, v2)] >= multigraph_size) 
 				continue;
 			//don't connect from different component
 			if (component_id[v1] != component_id[v2])
