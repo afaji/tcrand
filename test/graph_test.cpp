@@ -10,9 +10,10 @@ using namespace tcrand;
 
 int main(){
 	tcrand::GraphRandomizer gr;
-	Graph g = gr.node_count(10)
-				.edge_count(15)
+	Graph g = gr.node_count(3)
+				.edge_count(10)
 				.self_loop()
+				.multigraph()
 				.next();
 
 	vector<int> p1, p2;
