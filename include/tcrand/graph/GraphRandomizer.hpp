@@ -7,7 +7,7 @@
 #include <cstdio>
 #include <iostream>
 #include <map>
-#include "../graph.hpp"
+#include "../object.hpp"
 #define DEBUG false
 using namespace std;
 

@@ -6,18 +6,17 @@
 #include <string>
 #include <cstdio>
 #include <iostream>
-#include "../tree.hpp"
 #define DEBUG false
 using namespace std;
 
 namespace tcrand {
 
-	class Tree{
+	class Graph{
+	protected:
 		vector<int> _path_from;
 		vector<int> _path_to;
-		int _root;
-		vector<int> _parents;
-		int _node_count;
+		int num_edges;
+		int num_nodes;
 		
 		template< class T >
 		void reorder(vector<T> &v, vector<int> const &order )  {   
@@ -26,17 +25,8 @@ namespace tcrand {
 		        if ( d == s ) while ( d = order[d], d != s ) swap( v[s], v[d] );
 		    }
 		}
-		
-		Tree& shuffleDirection(){
-			int N = _path_to.size();
-			for (int i=0;i<N;i++){
-				if (rand_int(100) % 2)
-					swap(_path_to[i], _path_from[i]);
-			}
-			return *this;
-		}
 
-		Tree& shuffleOrder(){
+		Graph& shuffleOrder(){
 			int N = _path_to.size();
 			vector<int> indexes;
 			for (int i=0;i<N;i++)
@@ -48,32 +38,24 @@ namespace tcrand {
 		}
 
 	public:
-		Tree(int root, vector<int> p_from, vector<int> p_to, vector<int> parents){
+		Graph(int nodes, vector<int> p_from, vector<int> p_to){
 			_path_from = p_from;
 			_path_to = p_to;
-			_parents = parents;
-			_root = root;
-			_node_count = p_from.size() + 1;
+			num_edges = p_from.size();
+			num_nodes = nodes;
 			shuffleOrder();
-			shuffleDirection();
 		}
-
 		pair<vector<int>,vector<int> > edges(){
 			return make_pair(_path_from, _path_to);
 		}
 		
-		int root(){
-			return _root;
-		}
-
 		int node_count(){
-			return _node_count;
+			return num_nodes;
 		}
 
-		vector<int> parents(){
-			return _parents;
+		int edge_count(){
+			return num_edges;
 		}
-
 	};
 
 }

@@ -1,5 +1,5 @@
 #pragma once
 
 #include "utility.hpp"
-#include "tree/Tree.hpp"
+#include "object.hpp"
 #include "tree/TreeRandomizer.hpp"

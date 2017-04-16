@@ -1,5 +1,5 @@
 #pragma once
 
 #include "utility.hpp"
-#include "graph/Graph.hpp"
+#include "object.hpp"
 #include "graph/GraphRandomizer.hpp"

@@ -10,6 +10,7 @@ int main() {
 	TreeRandomizer tree_rand;
 	int N = 25;
 	Tree t = tree_rand.node_count(N).depth(5).index_base(1).root(10).next();
+	Graph g = tree_rand.node_count(N).depth(5).index_base(1).root(10).next();
 
 
 	

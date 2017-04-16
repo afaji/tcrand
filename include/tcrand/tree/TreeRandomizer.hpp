@@ -6,6 +6,7 @@
 #include <string>
 #include <cstdio>
 #include <iostream>
+#include "../object.hpp"
 #include "../tree.hpp"
 
 #define DEBUG false
