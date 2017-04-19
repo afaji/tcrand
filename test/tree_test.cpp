@@ -6,19 +6,24 @@ using namespace std;
 using namespace tcrand;
 
 
-int main() {
-	TreeRandomizer tree_rand;
-	int N = 25;
-	Tree t = tree_rand.node_count(N).depth(5).index_base(1).root(10).next();
-	Graph g = tree_rand.node_count(N).depth(5).index_base(1).root(10).next();
 
+void print(Tree t){
 
-	
+	cout<<"printing tree: "<<endl;
 	vector<int> p1, p2;
 	p1 = t.edges().first;
 	p2 = t.edges().second;
 	
-	for (int i=0;i<N-1;i++){
+	for (int i=0;i<p1.size() - 1;i++){
 		cout<<p1[i] <<" "<<p2[i]<<endl;
 	}
+}
+
+int main() {
+	int N = 10;
+	
+	print( StarTreeRandomizer().node_count(N).next() );
+	print( ChainTreeRandomizer().node_count(N).next() );
+	print( TreeRandomizer().node_count(N).next() );
+
 }
