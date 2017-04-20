@@ -18,11 +18,10 @@ namespace tcrand {
 
 
 	protected:
-		int params_num_node;
-		int params_leaf_min;
-		int params_leaf_max;
-		int params_child_min;
-		int params_child_max;
+		int params_node_count;
+		int params_leaf_count;
+		int params_child_count_min;
+		int params_child_count_max;
 		int params_depth;
 		int params_index_base;
 		int params_root;
@@ -32,6 +31,7 @@ namespace tcrand {
 			vector<int> from;
 			vector<int> to;
 			int N = par.size();
+
 			int new_root = params_root - params_index_base;
 			if (params_root == -1)
 				new_root = 0;
@@ -55,13 +55,12 @@ namespace tcrand {
 		TreeRandomizerBase() {
 			params_root = -1;
 			params_index_base = 0;
-			params_child_min = 1;
-			params_child_max = 1000000;
+			params_child_count_min = 1;
+			params_child_count_max = 1000000;
 
-			params_leaf_min = 1;
-			params_leaf_max = 1000000;
-			params_num_node = 10;
-			is_depth_set = false;
+			params_leaf_count = -1;
+			params_node_count = 10;
+			params_depth = -1;
 			if (DEBUG)
 				fprintf(stderr, "new TreeRandomizer is initiated\n");
 		}
@@ -71,7 +70,7 @@ namespace tcrand {
 			load_params();
 			validate();
 
-			for (int i=0;i<params_num_node;i++)
+			for (int i=0;i<params_node_count;i++)
 				parent.push_back(-1);
 
 			calculate_tree();
@@ -81,7 +80,7 @@ namespace tcrand {
 		}
 
 		T& node_count(int n){
-			params_num_node = n;
+			params_node_count = n;
 			return static_cast<T&>(*this);
 		}
 
@@ -89,8 +88,8 @@ namespace tcrand {
 		T& child_count(int lo, int hi){
 			if (lo > hi)
 				swap(lo,hi);
-			params_child_min = lo;
-			params_child_max = hi;
+			params_child_count_min = lo;
+			params_child_count_max = hi;
 
 			return static_cast<T&>(*this);
 		}
@@ -101,14 +100,12 @@ namespace tcrand {
 		}
 
 		T& leaf_count(int n){
-			params_leaf_max = n;
-			params_leaf_min = n;
+			params_leaf_count = n;
 			return static_cast<T&>(*this);
 		}
 
 		T& depth(int d){
 			params_depth = d;
-			is_depth_set = true;
 			return static_cast<T&>(*this);
 		}
 
@@ -140,7 +137,6 @@ namespace tcrand {
 		int child_max;
 
 		int num_depth;
-		bool is_depth_set;
 
 		//stores the solution
 		vector<int> parent;
@@ -148,7 +144,7 @@ namespace tcrand {
 		void validate(){
 			if (params_root >= 0 && params_root < params_index_base)
 				throw runtime_error("Tree root is too small");
-			if (params_root >= 0 && params_root > params_index_base + params_num_node)
+			if (params_root >= 0 && params_root > params_index_base + params_node_count)
 				throw runtime_error("Tree root is too big");
 		}
 
@@ -176,14 +172,14 @@ namespace tcrand {
 				if (greedy_mode)
 					idx = start_id;
 					
-				if (is_depth_set && !depth_reached)
+				if (num_depth < 0 && !depth_reached)
 					idx = options.size() - 1;
 
 				int tmp = node_id;
 				for (int j=0;j<inner_child[i];j++){
 					tree_connect(node_id++, options[idx]);
 					
-					if (!is_depth_set || num_depth > opt_depth[idx] + 1){
+					if (num_depth < 0|| num_depth > opt_depth[idx] + 1){
 						options.push_back(node_id - 1);
 						opt_depth.push_back(opt_depth[idx] + 1);
 					} else {
@@ -249,8 +245,8 @@ namespace tcrand {
 		 * then randomly select one configuration and build the tree.
 		 */
 		void calculate_tree(){
-			int _range =  min(params_num_node, child_max - child_min);
-			int _node_left = params_num_node - 1;
+			int _range =  min(params_node_count, child_max - child_min);
+			int _node_left = params_node_count - 1;
 			int _surplus = 0;
 			int _comp = 0;
 			int _curr_pos = 1; //nodes currently used
@@ -260,19 +256,19 @@ namespace tcrand {
 			long long _next_depth_adder = 1;
 			vector <pair<int, int> > _leaf_opts;
 
-			while (_curr_pos <= params_num_node){
+			while (_curr_pos <= params_node_count){
 				if (DEBUG){
 					fprintf(stderr, "now has %d nodes, %d leaves, and is possible to add up to %d leaf nodes\n", _curr_pos, _curr_leaf, _surplus);
-					fprintf(stderr, " to reach %d node,  we will have final leaf of %d\n", params_num_node, _curr_leaf + _node_left);
+					fprintf(stderr, " to reach %d node,  we will have final leaf of %d\n", params_node_count, _curr_leaf + _node_left);
 
 
 				}
-				if (_curr_pos + _surplus >= params_num_node){
+				if (_curr_pos + _surplus >= params_node_count){
 					int _valid_leaf = _curr_leaf + _node_left;
 
 					if (_valid_leaf >= leaf_min   
 						&& _valid_leaf <= leaf_max 
-						&& (!is_depth_set || (_comp >= num_depth && _balance_depth <= num_depth ) ) ) //total subtree comp. has to be atleast depth, and the result of the balance tree's depth cannot exeed depth
+						&& (num_depth < 0 || (_comp >= num_depth && _balance_depth <= num_depth ) ) ) //total subtree comp. has to be atleast depth, and the result of the balance tree's depth cannot exeed depth
 						{
 						_leaf_opts.push_back(make_pair(_valid_leaf, _comp) );
 						if (DEBUG) 
@@ -282,7 +278,7 @@ namespace tcrand {
 				_node_left -= child_min;
 				_curr_pos += child_min;
 				_curr_leaf += (child_min - 1);
-				_surplus = min(_surplus + _range, params_num_node);
+				_surplus = min(_surplus + _range, params_node_count);
 				if (_comp >= _next_depth_increase){
 					_balance_depth++;
 					_next_depth_adder *= child_max;
@@ -311,11 +307,18 @@ namespace tcrand {
 		}
 
 		void load_params(){
-			child_min = params_child_min;
-			child_max = params_child_max;
+			child_min = params_child_count_min;
+			child_max = params_child_count_max;
 
-			leaf_min = params_leaf_min;
-			leaf_max = params_leaf_max;
+			if (params_leaf_count != -1) {
+				leaf_min = params_leaf_count;
+				leaf_max = params_leaf_count;
+			}
+			else
+			{
+				leaf_min = 1;
+				leaf_max = 1000000;	
+			}
 
 			num_depth = params_depth;
 		}

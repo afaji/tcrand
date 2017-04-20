@@ -14,7 +14,7 @@ void print(Tree t){
 	p1 = t.edges().first;
 	p2 = t.edges().second;
 	
-	for (int i=0;i<p1.size() - 1;i++){
+	for (int i=0;i<p1.size();i++){
 		cout<<p1[i] <<" "<<p2[i]<<endl;
 	}
 }
@@ -24,6 +24,6 @@ int main() {
 	
 	print( StarTreeRandomizer().node_count(N).next() );
 	print( ChainTreeRandomizer().node_count(N).next() );
-	print( TreeRandomizer().node_count(N).next() );
+	print( CaterpillarTreeRandomizer().node_count(20).child_count(4,5).next() );
 
 }

@@ -5,3 +5,4 @@
 #include "tree/TreeRandomizer.hpp"
 #include "tree/StarTreeRandomizer.hpp"
 #include "tree/ChainTreeRandomizer.hpp"
+#include "tree/CaterpillarTreeRandomizer.hpp"
