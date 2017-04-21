@@ -42,6 +42,7 @@ class GraphRandomizer{
 	int params_scc;
 	int params_bridge;
 	int params_index_base;
+	bool is_biconnected;
 	bool is_scc_set;
 	bool is_component_set;
 	bool allow_loop;
@@ -114,6 +115,12 @@ class GraphRandomizer{
 					int v2 = scc_members[ scc_to ][ rand_int(scc_members[scc_to].size() ) ];
 					addEdge(v1, v2, pathSet);
 					used++;
+					if (is_biconnected){
+						v1 = scc_members[ scc_from ][ rand_int( scc_members[scc_from].size() ) ];
+						v2 = scc_members[ pos ][ rand_int(scc_members[scc_to].size() ) ];
+						addEdge( v1, v2 , pathSet);
+						used++;
+					}
 				
 				}
 
@@ -165,6 +172,7 @@ public:
 		is_scc_set = false;
 		is_directed = false;
 		is_bridge_set = false;
+		is_biconnected = false;
 		multigraph_size = 1;
 		graph_type = type_basic;
 	}
@@ -221,6 +229,11 @@ public:
 
 	GraphRandomizer& multigraph(int m = 1000000){
 		multigraph_size = m;
+		return *this;
+	}
+
+	GraphRandomizer& biconnected(){
+		is_biconnected = true;
 		return *this;
 	}
 
