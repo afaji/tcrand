@@ -28,6 +28,8 @@ namespace tcrand {
 			}
 
 		public:
+			Tree(){}
+
 			Tree(int root, vector<int> p_from, vector<int> p_to, vector<int> parents):
 				Graph(p_from.size() + 1, p_from, p_to) {
 				_parents = parents;

@@ -38,6 +38,8 @@ namespace tcrand {
 		}
 
 	public:
+		Graph(){}
+		
 		Graph(int nodes, vector<int> p_from, vector<int> p_to){
 			_path_from = p_from;
 			_path_to = p_to;
