@@ -58,7 +58,7 @@ class GraphRandomizer{
 		if (pathSet[make_pair(st, ed)] >= multigraph_size)
 			return false;
 
-		if (!is_directed && pathSet[make_pair(st, ed)] >= multigraph_size)
+		if (!is_directed && pathSet[make_pair(ed, st)] >= multigraph_size)
 			return false;
 
 		pathSet[make_pair(st, ed)]++;
