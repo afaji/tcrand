@@ -13,7 +13,7 @@ int main() {
 	//furthermore, we want the list to have 5 distinct elements
 	//define the object
 	StringRandomizer str_rnd;
-	vectorRandomizer<string> vector_rnd;
+	VectorRandomizer<string> vector_rnd;
 
 	//define the string
 	str_rnd.charset("[a-z]").length(3, 5);

@@ -15,7 +15,7 @@ using namespace std;
 namespace tcrand {
 
 	template <class T>
-	class vectorRandomizer{
+	class VectorRandomizer{
 		vector<T> result;
 		function<T(void)> generator;
 		map<T, int> occurences;
@@ -35,29 +35,29 @@ namespace tcrand {
 
 	public:
 
-		vectorRandomizer(){
+		VectorRandomizer(){
 			param_length = 10;
 			is_unique = false;
 			_distinct_elements = -1;
 		}
 
-		vectorRandomizer& length(int n){
+		VectorRandomizer& length(int n){
 			param_length = n;
 			return *this;
 		}
 
-		vectorRandomizer& engine(function<T(void)> f){
+		VectorRandomizer& engine(function<T(void)> f){
 			generator = f;
 			return *this;
 		}
 
-		vectorRandomizer& unique(bool u){
+		VectorRandomizer& unique(bool u){
 			is_unique = u;
 			_distinct_elements = -1;
 			return *this;
 		}
 
-		vectorRandomizer& distinct_elements(int n){
+		VectorRandomizer& distinct_elements(int n){
 			is_unique = true;
 			_distinct_elements = n;
 			return *this;
