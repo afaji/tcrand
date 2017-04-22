@@ -13,7 +13,6 @@
 using namespace std;
 
 namespace tcrand {
-
 	namespace internal {
 		vector<int> random_with_sum(int count, int sum, int min_val = 1){
 			vector<int> res;
@@ -93,219 +92,219 @@ namespace tcrand {
 	}
 
 using namespace internal;
+	template <class T>
+	class GraphRandomizerBase{
+	public:
+		int params_node_count;
+		int params_edge_count;
+		int params_component_count;
+		int params_index_base;
+		int params_multi_path;
+		int params_bridge_count;
+		bool params_self_loop;
 
-class GraphRandomizer{
-	int params_node_count;
-	int params_edge_count;
-	int params_component_count;
-	int params_index_base;
-	int params_multi_path;
-	int params_bridge_count;
-	bool params_self_loop;
-
-
-
-	Graph load_graph(const map<pair<int, int> , int>& pathSet){
-		
-		vector<int> from;
-		vector<int> to;
-		vector<int> nodes;
-		for (int i=0;i<params_node_count;i++)
-			nodes.push_back(i);
-
-		for (auto path: pathSet){
-			for (int i=0;i<path.second;i++){
-				from.push_back(path.first.first);
-				to.push_back(path.first.second);
-			}
+		GraphRandomizerBase(){
+			params_index_base = 0;
+			params_component_count = 1;
+			params_node_count = 8;
+			params_edge_count = 10;
+			params_self_loop = false;
+			params_multi_path = 1;
+			params_bridge_count = -1;
 		}
-		Graph g = Graph(nodes, from, to, params_index_base);
-		return g;
-	}
-	
-	template <typename Func>
-	vector<Graph> join_as_components(vector<Graph> subgraphs, Func merge_func, int tree_comp = 1){
-		int tot_nodes = 0;
-		for (auto g: subgraphs)
-			tot_nodes += g.node_count();
-		int min_val = 1;
-		vector<int> tree_size = random_with_sum(tree_comp, tot_nodes, min_val);
-		vector<Graph> res;
-		int id = 0;
-		for (int i=0;i<tree_comp;i++){
-			vector<Graph> g;
-			for (int j=0;j<tree_size[i];j++){
-				g.emplace_back(subgraphs[id++]);
-			}
-			res.emplace_back(merge_func(g, params_index_base));
+
+		T& index_base(int b){
+			params_index_base = b;
+			return static_cast<T&>(*this);
 		}
-		return res;
-	}
 
-	vector<Graph> init_subgraphs(int n){
-		vector<Graph> res;
-		int b = params_index_base;
-		for (int i=0;i<n;i++){
-			vector<int> nodes, U, V;
-			nodes.push_back(b);
-			res.emplace_back(Graph( nodes, U, V, b));
-			b++;
+		// parameters
+		T& component_count(int n){
+			params_component_count = n;
+			return static_cast<T&>(*this);
 		}
-		return res;
-	}
-
-	Graph merge_graph(vector<Graph> subgraphs, int leftover, int cut_vertices = 0){
+			
+		T& node_count(int n){
+			params_node_count = n;
+			return static_cast<T&>(*this);
+		}
 		
-		map< pair<int,int>, int> path;
+		T& edge_count(int n){
+			params_edge_count = n;
+			return static_cast<T&>(*this);
+		}
+
+		T& self_loop(){
+			params_self_loop = true;
+			return static_cast<T&>(*this);
+		}
+
+		T& multi_path(int m = 1000000){
+			params_multi_path = m;
+			return static_cast<T&>(*this);
+		}
 		
-		vector<int> nodes;
-		vector<int> component_id;
-		vector<int> component_size;
-		vector<int> component_offset;
-		int offset = 0;
-		int c_id = 0;
-		int N = subgraphs.size();
-		for (int i=0;i< N;i++){
-			Graph &g = subgraphs[i];
-			auto V = g.edges().first;
-			auto U = g.edges().second;
-			//join_vector(nodes, g.nodes());
-			for (auto node : g.nodes()){
-				nodes.push_back(node);
-				component_id.push_back(c_id);
-			}
-			c_id++;
-			component_size.push_back(g.node_count());
-			component_offset.push_back(offset);
-			offset += g.node_count();
+		T& bridge_count(int m){
+			params_bridge_count = m;
+			return static_cast<T&>(*this);
+		}
 
-			int x = V.size();
-			for (int i=0;i<x;i++){
-				path[make_pair(U[i], V[i])]++;
-			}
 
-			//add articulation point
-			if (cut_vertices > 0 && i > 0){
-				cut_vertices--;
-				leftover--;
-				int u = g.nodes()[rand_int(g.node_count())];
-				int v = subgraphs[i-1].nodes()[rand_int(subgraphs[i-1].node_count())];
+		Graph next(){
+			int attempt = 3;
+			int max_edge = 0;
+			int min_edge = params_edge_count + params_node_count;
+			while (attempt--){
+				vector<Graph> g = init_subgraphs(params_node_count);
 				
-				if (u > v) swap(u,v);
-				path[make_pair(u,v)]++;
+				if (params_bridge_count == -1)
+					g = join_as_components(g, to_single_tree, params_component_count);
+				else{
+					g = join_as_components(g, to_biconnected, params_component_count + params_bridge_count);
+				}
+
+				//add leftover edges, as long as they are from different components.
+				int M = params_edge_count;
+
+				for (auto _g:g)
+					M -= _g.edge_count();
+				Graph final = merge_graph(g, M, params_bridge_count);
+				if (final.edge_count() == params_edge_count)
+					return final;
 			}
-		}
-		int node_size = nodes.size();
-		//can it be dense graph?
-		vector<pair<int,int>> options;
-		if (node_size <= 1000 && node_size * node_size * params_multi_path <= 1000000){
-			for (int j=0;j<node_size;j++)
-				for (int k=0;k<node_size;k++)
-					for (int i=0;i<params_multi_path;i++)
-						options.push_back(make_pair(nodes[j],nodes[k]));
 
-			random_shuffle(options.begin(), options.end());
+			throw runtime_error("\nFailed to construct the requested graph :'(\nPlease make the constraint less strict\n ");
 		}
 
-		int opt_id = 0;
-		int attempt = 0;
-		while (leftover > 0 && attempt++ < 1000000){
-			int st = nodes[rand_int(node_size)];
+
+	protected:
+		Graph load_graph(const map<pair<int, int> , int>& pathSet){
 			
-			int comp_id = component_id[st - params_index_base];
-			int ed = nodes[ component_offset[comp_id] + rand_int( component_size[comp_id] ) ];
+			vector<int> from;
+			vector<int> to;
+			vector<int> nodes;
+			for (int i=0;i<params_node_count;i++)
+				nodes.push_back(i + params_index_base);
 
-			if (opt_id < options.size()){
-				st = options[opt_id].first;
-				ed = options[opt_id++].second;
+			for (auto path: pathSet){
+				for (int i=0;i<path.second;i++){
+					from.push_back(path.first.first + params_index_base);
+					to.push_back(path.first.second + params_index_base);
+				}
 			}
-			if (st > ed) swap(st, ed);
-			if (component_id[st - params_index_base] != component_id[ed - params_index_base]) continue;
-			if (st == ed && !params_self_loop) continue;
-			//check:
-			if (path[make_pair(st,ed)] + path[make_pair(ed,st)] >= params_multi_path ) continue;
-			path[make_pair(st, ed)]++;
-			leftover--;
+			Graph g = Graph(nodes, from, to, params_index_base);
+			return g;
 		}
-
-		return load_graph(path);
-	}
-
-
-public:
-	GraphRandomizer(){
-		params_index_base = 0;
-		params_component_count = 1;
-		params_node_count = 8;
-		params_edge_count = 10;
-		params_self_loop = false;
-		params_multi_path = 1;
-		params_bridge_count = -1;
-	}
-
-	GraphRandomizer& index_base(int b){
-		params_index_base = b;
-		return *this;
-	}
-
-	// parameters
-	GraphRandomizer& component_count(int n){
-		params_component_count = n;
-		return *this;
-	}
 		
-	GraphRandomizer& node_count(int n){
-		params_node_count = n;
-		return *this;
-	}
-	
-	GraphRandomizer& edge_count(int n){
-		params_edge_count = n;
-		return *this;
-	}
-
-	GraphRandomizer& self_loop(){
-		params_self_loop = true;
-		return *this;
-	}
-
-	GraphRandomizer& multi_path(int m = 1000000){
-		params_multi_path = m;
-		return *this;
-	}
-	
-	GraphRandomizer& bridge_count(int m){
-		params_bridge_count = m;
-		return *this;
-	}
-
-
-	Graph next(){
-		int attempt = 3;
-		int max_edge = 0;
-		int min_edge = params_edge_count + params_node_count;
-		while (attempt--){
-			vector<Graph> g = init_subgraphs(params_node_count);
-			
-			if (params_bridge_count == -1)
-				g = join_as_components(g, to_single_tree, params_component_count);
-			else{
-				g = join_as_components(g, to_biconnected, params_component_count + params_bridge_count);
+		template <typename Func>
+		vector<Graph> join_as_components(vector<Graph> subgraphs, Func merge_func, int tree_comp = 1){
+			int tot_nodes = 0;
+			for (auto g: subgraphs)
+				tot_nodes += g.node_count();
+			int min_val = 1;
+			vector<int> tree_size = random_with_sum(tree_comp, tot_nodes, min_val);
+			vector<Graph> res;
+			int id = 0;
+			for (int i=0;i<tree_comp;i++){
+				vector<Graph> g;
+				for (int j=0;j<tree_size[i];j++){
+					g.emplace_back(subgraphs[id++]);
+				}
+				res.emplace_back(merge_func(g));
 			}
-
-			//add leftover edges, as long as they are from different components.
-			int M = params_edge_count;
-
-			for (auto _g:g)
-				M -= _g.edge_count();
-			Graph final = merge_graph(g, M, params_bridge_count);
-			if (final.edge_count() == params_edge_count)
-				return final;
+			return res;
 		}
 
-		throw runtime_error("\nFailed to construct the requested graph :'(\nPlease make the constraint less strict\n ");
-	}
-};
+		vector<Graph> init_subgraphs(int n){
+			vector<Graph> res;
+			int b = 0;
+			for (int i=0;i<n;i++){
+				vector<int> nodes, U, V;
+				nodes.push_back(b);
+				res.emplace_back(Graph( nodes, U, V, b));
+				b++;
+			}
+			return res;
+		}
+
+		Graph merge_graph(vector<Graph> subgraphs, int leftover, int cut_vertices = 0){
+			
+			map< pair<int,int>, int> path;
+			
+			vector<int> nodes;
+			vector<int> component_id;
+			vector<int> component_size;
+			vector<int> component_offset;
+			int offset = 0;
+			int c_id = 0;
+			int N = subgraphs.size();
+			for (int i=0;i< N;i++){
+				Graph &g = subgraphs[i];
+				auto V = g.edges().first;
+				auto U = g.edges().second;
+				//join_vector(nodes, g.nodes());
+				for (auto node : g.nodes()){
+					nodes.push_back(node);
+					component_id.push_back(c_id);
+				}
+				c_id++;
+				component_size.push_back(g.node_count());
+				component_offset.push_back(offset);
+				offset += g.node_count();
+
+				int x = V.size();
+				for (int i=0;i<x;i++){
+					path[make_pair(U[i], V[i])]++;
+				}
+
+				//add articulation point
+				if (cut_vertices > 0 && i > 0){
+					cut_vertices--;
+					leftover--;
+					int u = g.nodes()[rand_int(g.node_count())];
+					int v = subgraphs[i-1].nodes()[rand_int(subgraphs[i-1].node_count())];
+					
+					if (u > v) swap(u,v);
+					path[make_pair(u,v)]++;
+				}
+			}
+			int node_size = nodes.size();
+			//can it be dense graph?
+			vector<pair<int,int>> options;
+			if (node_size <= 1000 && node_size * node_size * params_multi_path <= 1000000){
+				for (int j=0;j<node_size;j++)
+					for (int k=0;k<node_size;k++)
+						for (int i=0;i<params_multi_path;i++)
+							options.push_back(make_pair(nodes[j],nodes[k]));
+
+				random_shuffle(options.begin(), options.end());
+			}
+
+			int opt_id = 0;
+			int attempt = 0;
+			while (leftover > 0 && attempt++ < 1000000){
+				int st = nodes[rand_int(node_size)];
+				
+				int comp_id = component_id[st];
+				int ed = nodes[ component_offset[comp_id] + rand_int( component_size[comp_id] ) ];
+
+				if (opt_id < options.size()){
+					st = options[opt_id].first;
+					ed = options[opt_id++].second;
+				}
+				if (st > ed) swap(st, ed);
+				if (component_id[st] != component_id[ed]) continue;
+				if (st == ed && !params_self_loop) continue;
+				//check:
+				if (path[make_pair(st,ed)] + path[make_pair(ed,st)] >= params_multi_path ) continue;
+				path[make_pair(st, ed)]++;
+				leftover--;
+			}
+
+			return load_graph(path);
+		}
+	};
+	class GraphRandomizer: public GraphRandomizerBase<GraphRandomizer>{};
 
 }
 
