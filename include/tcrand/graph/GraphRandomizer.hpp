@@ -222,8 +222,6 @@ class GraphRandomizer{
 				st = options[opt_id].first;
 				ed = options[opt_id++].second;
 			}
-			while (opt_id >= options.size());
-
 			if (st > ed) swap(st, ed);
 			if (component_id[st - params_index_base] != component_id[ed - params_index_base]) continue;
 			if (st == ed && !params_self_loop) continue;
@@ -293,7 +291,6 @@ public:
 			else{
 				g = join_as_components(g, to_biconnected, params_component_count + params_cut_vertices);
 			}
-			
 			//add leftover edges, as long as they are from different components.
 			int M = params_edge_count;
 			for (auto _g:g)

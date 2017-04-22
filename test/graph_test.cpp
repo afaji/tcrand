@@ -9,7 +9,7 @@ using namespace std;
 using namespace tcrand;
 int main(){
 	tcrand::GraphRandomizer gr;
-	Graph g = GraphRandomizer().node_count(5).edge_count(10).index_base(10).next();
+	Graph g = GraphRandomizer().index_base(0).node_count(100000).edge_count(200000).next();
 
 	vector<int> ap = articulation_points(g);
 	cout<<ap.size()<<endl;
