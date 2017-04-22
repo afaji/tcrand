@@ -48,7 +48,7 @@ namespace tcrand {
 				to.push_back(i + params_index_base);
 				from.push_back(par[i]);	
 			}
-			return Tree( new_root , from , to , par );
+			return Tree( new_root , par, params_index_base );
 		}
 
 	public:

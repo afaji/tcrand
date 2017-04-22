@@ -15,8 +15,10 @@ namespace tcrand {
 	protected:
 		vector<int> _path_from;
 		vector<int> _path_to;
+		vector<int> _nodes;
 		int num_edges;
 		int num_nodes;
+		int _base;
 		
 		template< class T >
 		void reorder(vector<T> &v, vector<int> const &order )  {   
@@ -37,18 +39,28 @@ namespace tcrand {
 			return *this;
 		}
 
-	public:
-		Graph(){}
-		
-		Graph(int nodes, vector<int> p_from, vector<int> p_to){
+		void init_graph(vector<int> nodes, vector<int> p_from, vector<int> p_to, int base = 0){
 			_path_from = p_from;
 			_path_to = p_to;
 			num_edges = p_from.size();
-			num_nodes = nodes;
+			num_nodes = nodes.size();
+			_nodes = nodes;
+			_base = base;
 			shuffleOrder();
 		}
+
+	public:
+		Graph(){}
+		Graph(vector<int> nodes, vector<int> p_from, vector<int> p_to, int base = 0){
+			init_graph(nodes, p_from, p_to, base);
+		}
+		
 		pair<vector<int>,vector<int> > edges(){
 			return make_pair(_path_from, _path_to);
+		}
+
+		vector<int> nodes(){
+			return _nodes;
 		}
 		
 		int node_count(){
@@ -57,6 +69,10 @@ namespace tcrand {
 
 		int edge_count(){
 			return num_edges;
+		}
+
+		int index_base(){
+			return _base;
 		}
 	};
 

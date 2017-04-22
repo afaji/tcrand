@@ -30,11 +30,23 @@ namespace tcrand {
 		public:
 			Tree(){}
 
-			Tree(int root, vector<int> p_from, vector<int> p_to, vector<int> parents):
-				Graph(p_from.size() + 1, p_from, p_to) {
+			Tree(int root, vector<int> parents, int base = 0)
+			{
+				vector<int> path_from;
+				vector<int> path_to;
+				vector<int> nodes;
+				int M = parents.size();
+				for (int i=0;i<M;i++){
+					nodes.push_back(i + base);
+					if (parents[i] == -1)
+						continue;
+					path_from.push_back(parents[i]);
+					path_to.push_back(i + base);
+				}
+
+				Graph::init_graph(nodes, path_from, path_to, base);
 				_parents = parents;
 				_root = root;
-
 
 				shuffleDirection();
 			}

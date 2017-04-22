@@ -7,11 +7,13 @@ using namespace std;
 
 namespace tcrand {
 		
-		void find_articulation_point(int pos, int par, vector<vector<int>> &path, vector<int> &visited, int &v_time, vector<int> &vis_time, vector<int> &low, vector<bool> &ap){
+		vector<int> path[100000];
+
+		void find_articulation_point(int pos, int par, vector<int> &visited, int &v_time, vector<int> &vis_time, vector<int> &low, vector<bool> &ap){
 			if (visited[pos])
 				return;
 			visited[pos] = true;
-		 v_time++;
+			v_time++;
 			vis_time[pos] = v_time;
 			low[pos] = v_time;
 			int M = path[pos].size();
@@ -20,7 +22,7 @@ namespace tcrand {
 				int u = path[pos][i];
 				if (!visited[u]) {
 					child++;
-					find_articulation_point(u, pos, path, visited, v_time, vis_time, low, ap);
+					find_articulation_point(u, pos, visited, v_time, vis_time, low, ap);
 
 					low[pos] = min(low[pos], low[u]);
 					if (par == -1 && child > 1)
@@ -43,7 +45,6 @@ namespace tcrand {
 				base = min(base, min(from[i], to[i]));
 			}
 
-			vector<vector<int>> path(N);
 			for (int i=0;i<E;i++){
 				path[ from[i] - base ].push_back(to[i] - base);
 				path[ to[i] - base ].push_back(from[i] - base);
@@ -57,7 +58,7 @@ namespace tcrand {
 			int v_time = 0;
 			for (int i=0;i<N;i++){
 				if (!visited[i])
-					find_articulation_point(i, -1,path , visited , v_time , vis_time, low,is_ap);
+					find_articulation_point(i, -1 , visited , v_time , vis_time, low,is_ap);
 			}
 
 			vector <int> ap;
