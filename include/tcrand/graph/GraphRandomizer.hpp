@@ -15,13 +15,13 @@ using namespace std;
 namespace tcrand {
 
 	namespace internal {
-		vector<int> random_with_sum(int count, int sum){
+		vector<int> random_with_sum(int count, int sum, int min_val = 1){
 			vector<int> res;
-			for (int i=0;i < count-1;i++) res.push_back(rand_int(sum - count + 1));
-			res.push_back(sum - count);
+			for (int i=0;i < count-1;i++) res.push_back(rand_int(sum - min_val*count + 1 ));
+			res.push_back(sum - min_val*count);
 			sort(res.begin(), res.end());
-			for (int i=count-1;i>=1;i--) res[i] = 1 + (res[i] - res[i-1]);
-			res[0]++;
+			for (int i=count-1;i>=1;i--) res[i] = min_val + (res[i] - res[i-1]);
+			res[0]+=min_val;
 			//validate
 			int tot = 0;
 			for (int x:res)
@@ -43,7 +43,7 @@ namespace tcrand {
 			for (int i=0 ;i < N; i++){
 				//join one:
 				if (nodes.size() > 0){
-					int id = rand_int(max(0,i - 30) , i-1);
+					int id = rand_int(max(0,i / 30) , i-1); //misof's magic
 					is_leaf[id] = false;
 					int st = subgraphs[id].nodes()[ rand_int(subgraphs[id].node_count()) ];
 					int ed = subgraphs[i].nodes()[ rand_int(subgraphs[i].node_count()) ];
@@ -100,7 +100,7 @@ class GraphRandomizer{
 	int params_component_count;
 	int params_index_base;
 	int params_multi_path;
-	int params_cut_vertices;
+	int params_bridge_count;
 	bool params_self_loop;
 
 
@@ -128,7 +128,8 @@ class GraphRandomizer{
 		int tot_nodes = 0;
 		for (auto g: subgraphs)
 			tot_nodes += g.node_count();
-		vector<int> tree_size = random_with_sum(tree_comp, tot_nodes);
+		int min_val = 1;
+		vector<int> tree_size = random_with_sum(tree_comp, tot_nodes, min_val);
 		vector<Graph> res;
 		int id = 0;
 		for (int i=0;i<tree_comp;i++){
@@ -184,19 +185,14 @@ class GraphRandomizer{
 			}
 
 			//add articulation point
-			if (cut_vertices > 0 && i > 0 && g.node_count() > 1 && subgraphs[i-1].node_count() > 1){
+			if (cut_vertices > 0 && i > 0){
 				cut_vertices--;
-				leftover-=2;
+				leftover--;
 				int u = g.nodes()[rand_int(g.node_count())];
 				int v = subgraphs[i-1].nodes()[rand_int(subgraphs[i-1].node_count())];
-				int u2 = u;
-				int v2 = v;
-				while (v2 == v) v2 = subgraphs[i-1].nodes()[rand_int(subgraphs[i-1].node_count())];
-
+				
 				if (u > v) swap(u,v);
-				if (u2 > v2) swap(u2,v2);
 				path[make_pair(u,v)]++;
-				path[make_pair(u2,v2)]++;
 			}
 		}
 		int node_size = nodes.size();
@@ -212,7 +208,8 @@ class GraphRandomizer{
 		}
 
 		int opt_id = 0;
-		while (leftover > 0){
+		int attempt = 0;
+		while (leftover > 0 && attempt++ < 1000000){
 			int st = nodes[rand_int(node_size)];
 			
 			int comp_id = component_id[st - params_index_base];
@@ -243,7 +240,7 @@ public:
 		params_edge_count = 10;
 		params_self_loop = false;
 		params_multi_path = 1;
-		params_cut_vertices = -1;
+		params_bridge_count = -1;
 	}
 
 	GraphRandomizer& index_base(int b){
@@ -277,31 +274,36 @@ public:
 		return *this;
 	}
 	
-	GraphRandomizer& cut_vertices(int m){
-		params_cut_vertices = m;
+	GraphRandomizer& bridge_count(int m){
+		params_bridge_count = m;
 		return *this;
 	}
 
 
 	Graph next(){
-		while (true){
+		int attempt = 3;
+		int max_edge = 0;
+		int min_edge = params_edge_count + params_node_count;
+		while (attempt--){
 			vector<Graph> g = init_subgraphs(params_node_count);
 			
-			if (params_cut_vertices == -1)
+			if (params_bridge_count == -1)
 				g = join_as_components(g, to_single_tree, params_component_count);
 			else{
-				g = join_as_components(g, to_biconnected, params_component_count + params_cut_vertices);
+				g = join_as_components(g, to_biconnected, params_component_count + params_bridge_count);
 			}
+
 			//add leftover edges, as long as they are from different components.
 			int M = params_edge_count;
+
 			for (auto _g:g)
 				M -= _g.edge_count();
-
-			Graph final = merge_graph(g, M, params_cut_vertices);
-			
+			Graph final = merge_graph(g, M, params_bridge_count);
 			if (final.edge_count() == params_edge_count)
 				return final;
 		}
+
+		throw runtime_error("\nFailed to construct the requested graph :'(\nPlease make the constraint less strict\n ");
 	}
 };
 
