@@ -199,11 +199,12 @@ class GraphRandomizer{
 				path[make_pair(u2,v2)]++;
 			}
 		}
-
 		int node_size = nodes.size();
+
+		cout<<node_size<<endl;
 		//can it be dense graph?
 		vector<pair<int,int>> options;
-		if (node_size * node_size * params_multi_path <= 1000000){
+		if (node_size <= 1000 && node_size * node_size * params_multi_path <= 1000000){
 			for (int j=0;j<node_size;j++)
 				for (int k=0;k<node_size;k++)
 					for (int i=0;i<params_multi_path;i++)
@@ -211,6 +212,7 @@ class GraphRandomizer{
 
 			random_shuffle(options.begin(), options.end());
 		}
+
 		int opt_id = 0;
 		while (leftover > 0){
 			int st = nodes[rand_int(node_size)];
@@ -286,6 +288,7 @@ public:
 	Graph next(){
 		while (true){
 			vector<Graph> g = init_subgraphs(params_node_count);
+			
 			if (params_cut_vertices == -1)
 				g = join_as_components(g, to_single_tree, params_component_count);
 			else{
