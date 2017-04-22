@@ -9,14 +9,14 @@ using namespace std;
 using namespace tcrand;
 int main(){
 	tcrand::GraphRandomizer gr;
-	Graph g = GraphRandomizer().index_base(1).node_count(100000).edge_count(150000).bridge_count(50000).next();
+	Graph g = PetersenGraphRandomizer().index_base(100).next();
 
 	vector<int> ap = articulation_points(g);
 	cout<<ap.size()<<endl;
 	vector<int> U = g.edges().first;
 	vector<int> V = g.edges().second;
 	int M = g.edge_count();
-	//for (int i=0;i<M;i++)
-	//	cout<<U[i]<<" "<<V[i]<<endl;
+	for (int i=0;i<M;i++)
+		cout<<U[i]<<" "<<V[i]<<endl;
 
 }
