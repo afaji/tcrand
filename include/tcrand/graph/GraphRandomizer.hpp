@@ -200,8 +200,6 @@ class GraphRandomizer{
 			}
 		}
 		int node_size = nodes.size();
-
-		cout<<node_size<<endl;
 		//can it be dense graph?
 		vector<pair<int,int>> options;
 		if (node_size <= 1000 && node_size * node_size * params_multi_path <= 1000000){

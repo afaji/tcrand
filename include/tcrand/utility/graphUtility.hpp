@@ -35,7 +35,7 @@ namespace tcrand {
 			}
 		}
 		
-		vector<int> articulation_points(Graph &g){
+		vector<int> articulation_points(Graph g){
 			int N = g.node_count();
 			vector<int> from = g.edges().first;
 			vector<int> to = g.edges().second;
