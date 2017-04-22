@@ -22,7 +22,7 @@ int main() {
     tree_rand
         .node_count(1000);
         .depth(50);
-    
+
     // Randomly generate a tree.
     Tree tree = tree_rand.next();
     int N = tree.node_count();
@@ -38,9 +38,13 @@ int main() {
 
 ```
 
-### Installation
+## Installation
 
 This is a header-only library. To use, clone this repository (suppose that you clone it to `~/tcrand`), then add `-I ~/tcrand/include` to your C++ compilation flags.
+
+## Documentation
+
+API reference can be found [here](docs/api/README.md).
 
 ## License
 
