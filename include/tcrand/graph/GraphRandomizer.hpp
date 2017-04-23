@@ -33,7 +33,7 @@ namespace tcrand {
                 a.push_back(v);
         }
 
-        Graph to_biconnected(vector<Graph> subgraphs, int base = 0){
+        Graph to_biconnected(vector<Graph> subgraphs){
             int N = subgraphs.size();
             vector<int> U;
             vector<int> V;
@@ -65,10 +65,10 @@ namespace tcrand {
                     U.push_back(st); V.push_back(ed);
                 past = i;
             }
-            return Graph(nodes, U, V, base);
+            return Graph(nodes, U, V, 0);
         }
 
-        Graph to_single_tree(vector<Graph> subgraphs, int base = 0){
+        Graph to_single_tree(vector<Graph> subgraphs){
             int N = subgraphs.size();
             vector<int> U;
             vector<int> V;
@@ -86,7 +86,7 @@ namespace tcrand {
                 join_vector(U, subgraphs[i].edges().first);
                 join_vector(V, subgraphs[i].edges().second);
             }
-            return Graph(nodes, U, V, base);
+            return Graph(nodes, U, V, 0);
         }
 
     }
