@@ -33,16 +33,21 @@ namespace tcrand {
                 a.push_back(v);
         }
 
+        int extra_bridge;
         Graph to_biconnected(vector<Graph> subgraphs){
+            //cout<<"KAGI"<<endl;
             int N = subgraphs.size();
             vector<int> U;
             vector<int> V;
             vector<int> nodes;
             vector<bool> is_leaf;
+
+            int first_leaf = -1;
             for (int i=0 ;i < N; i++){
                 //join one:
                 if (nodes.size() > 0){
-                    int id = rand_int(max(0,i / 30) , i-1); //misof's magic
+                    int id = rand_int(max(0,i - 30) , i-1); //misof's magic
+                    if (i < 3) id = 0;  //alham's magic
                     is_leaf[id] = false;
                     int st = subgraphs[id].nodes()[ rand_int(subgraphs[id].node_count()) ];
                     int ed = subgraphs[i].nodes()[ rand_int(subgraphs[i].node_count()) ];
@@ -50,13 +55,22 @@ namespace tcrand {
                     U.push_back(st); V.push_back(ed);
                 }
                 is_leaf.push_back(true);
+
                 join_vector(nodes, subgraphs[i].nodes());
                 join_vector(U, subgraphs[i].edges().first);
                 join_vector(V, subgraphs[i].edges().second);
             }
-
+            if (N <= 2){
+                if (N == 2) extra_bridge++;
+                return Graph(nodes, U, V, 0);
+            }
+            return Graph(nodes, U, V, 0);
+            
             int past = 0;
-            for (int i=1;i<N;i++){
+            while (!is_leaf[past++]){}
+            first_leaf = past+1;
+            
+            for (int i=first_leaf;i<N;i++){
                 if (!is_leaf[i]) continue;
                 
                 int st = subgraphs[past].nodes()[ rand_int(subgraphs[past].node_count()) ];
@@ -155,6 +169,7 @@ using namespace internal;
             int max_edge = 0;
             int min_edge = params_edge_count + params_node_count;
             while (attempt--){
+                extra_bridge = 0;
                 vector<Graph> g = init_subgraphs(params_node_count);
                 
                 if (params_bridge_count == -1)
@@ -168,7 +183,7 @@ using namespace internal;
 
                 for (auto _g:g)
                     M -= _g.edge_count();
-                Graph final = merge_graph(g, M, params_bridge_count);
+                Graph final = merge_graph(g, M, params_bridge_count - extra_bridge);
                 if (final.edge_count() == params_edge_count)
                     return final;
             }
