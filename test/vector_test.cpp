@@ -3,6 +3,7 @@
 #include <iostream>
 #include <ctime>
 #include <tuple>
+#include <vector>
 using namespace std;
 using namespace tcrand;
 
@@ -12,6 +13,13 @@ int main() {
 	//we want to get a list of string, where for each string consists only of lowercase with length from 3 to 5
 	//furthermore, we want the list to have 5 distinct elements
 	//define the object
+
+	vector<int> xx = rand_ints_with_sum(10, 100, 9);
+
+	for (auto bz:xx)
+		printf("%d ",bz);
+	printf("\n");
+	return 0;
 	StringRandomizer str_rnd;
 	VectorRandomizer<string> vector_rnd;
 
