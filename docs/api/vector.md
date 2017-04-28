@@ -33,6 +33,13 @@ class VectorRandomizer;
 
 #### Properties
 
+- <a href="#length">length</a>
+- <a href="#engine">engine</a>
+- <a href="#unique">unique</a>
+- <a href="#distinct_elements">distinct_elements</a>
+
+---
+
 - <a href="#length" name="length">length</a>
 
   ```cpp
