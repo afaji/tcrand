@@ -19,3 +19,6 @@ using namespace tcrand;
   - [rand_subarray(const V& v, int length)](utility.md#rand_subarray__V_int)
   - [rand_subsequence(const V& v)](utility.md#rand_subarray__V)
   - [rand_subsequence(const V& v, int length)](utility.md#rand_subarray__V_int)
+
+- [vector](vector.md)
+  - [VectorRandomizer](vector.md#vectorrandomizer)
