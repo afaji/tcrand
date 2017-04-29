@@ -2,7 +2,11 @@
 
 **tcrand** is a C++ library for random generation of various competitive programming data structures, such as arrays and trees.
 
-**WARNING**: This library is still in beta version. Use at your own risk!
+**WARNING**: This library is still in **beta** version. Use at your own risk!
+
+## Documentation
+
+API reference can be found [here](docs/api/README.md).
 
 ## Example
 
@@ -40,11 +44,11 @@ int main() {
 
 ## Installation
 
-This is a header-only library. To use, clone this repository (suppose that you clone it to `~/tcrand`), then add `-I ~/tcrand/include` to your C++ compilation flags.
+This is a header-only library. To use:
 
-## Documentation
-
-API reference can be found [here](docs/api/README.md).
+- Make sure you have a C++11 compiler. 
+- Clone this repository (suppose that you clone it to `~/tcrand`).
+- Add `-std=c++11 -I ~/tcrand/include` to your C++ compilation flags.
 
 ## License
 
