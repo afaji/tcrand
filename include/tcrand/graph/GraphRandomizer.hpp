@@ -180,6 +180,9 @@ using namespace internal;
 
                 //add leftover edges, as long as they are from different components.
                 int M = params_edge_count;
+                
+                if (extra_bridge > 0)
+                    continue;
 
                 for (auto _g:g)
                     M -= _g.edge_count();
@@ -217,7 +220,22 @@ using namespace internal;
             for (auto g: subgraphs)
                 tot_nodes += g.node_count();
             int min_val = 1;
-            vector<int> tree_size = random_with_sum(tree_comp, tot_nodes, min_val);
+            int gen_comp = tree_comp;
+            int gen_nodes = tot_nodes;
+            if (params_bridge_count > 0){
+                min_val = 3;
+                while (gen_comp * 3 > gen_nodes){ 
+                    gen_comp--;
+                    gen_nodes--;
+                }
+                if (gen_comp <= 0)
+                    throw runtime_error("too many bridges");
+            }
+            vector<int> tree_size = random_with_sum(gen_comp, gen_nodes, min_val);
+            while (tree_size.size() < tree_comp)
+                tree_size.push_back(1);
+            random_shuffle(tree_size.begin(), tree_size.end());
+
             vector<Graph> res;
             int id = 0;
             for (int i=0;i<tree_comp;i++){
