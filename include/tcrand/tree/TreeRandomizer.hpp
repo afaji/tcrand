@@ -172,7 +172,7 @@ namespace tcrand {
                 if (greedy_mode)
                     idx = start_id;
                     
-                if (num_depth < 0 && !depth_reached)
+                if (num_depth > 0 && !depth_reached)
                     idx = options.size() - 1;
 
                 int tmp = node_id;
