@@ -65,15 +65,16 @@ namespace tcrand {
                     vector<int> options;
                     //get all possible depth, then select randomly:
                     for (int j=1;j<Base::params_node_count;j++){
-                        if (j * (Base::params_child_count_min) <= Base::params_node_count 
+                        if (j * (Base::params_child_count_min) < Base::params_node_count 
                             &&  j * (Base::params_child_count_max) >= Base::params_node_count )
                             options.push_back(j);
                     }
 
                     if (options.size() == 0)
-                        throw runtime_error("impossible to generate caterpillar tree with the given parameter(s)");
-
+                        throw runtime_error("Opt: impossible to generate caterpillar tree with the given parameter(s)");
+                    
                     int d = options[rand_int(options.size()) ];
+
                     for (;i<d;i++){
                         add_leg(i-1, i);
                         add_body(i);
@@ -85,17 +86,17 @@ namespace tcrand {
                     while (j < body_options && leg_counts[j] >= Base::params_child_count_min) j++;
                     if (j >= body_options)
                         break;
-
                     if (leg_counts[j] < Base::params_child_count_min)
                         add_leg(j,i);
                 
                 }
+                while (j < body_options && leg_counts[j] >= Base::params_child_count_min) j++;
                 if (j < body_options)
-                    throw runtime_error("impossible to generate caterpillar tree with the given parameter(s)");
+                    throw runtime_error("J: impossible to generate caterpillar tree with the given parameter(s)");
 
                 for (;i<n;i++){
                     if (body_options == 0)
-                        throw runtime_error("impossible to generate caterpillar tree with the given parameter(s)");
+                        throw runtime_error("B: impossible to generate caterpillar tree with the given parameter(s)");
                     int p = rand_int(body_options);
                     add_leg(p,i);
                 }
